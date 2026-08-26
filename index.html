@@ -416,13 +416,12 @@ function syncDivine(){
 }
 function deityPossessive(){
   const ob = (typeof OB!=='undefined' && !S.onboarded);
-  const prList = ob ? (OB.divinePronouns.length ? OB.divinePronouns : ['none']) : pronounList();
-  const pr = prList[0];
-  if(pr==='He') return 'His';
-  if(pr==='She') return 'Her';
-  if(pr==='They') return 'Their';
-  const nm = ob ? (OB.divineNames[0] || (OB.divineCustom && OB.divineCustom.trim()) || 'the Divine') : divineList()[0];
-  return nm + '\u2019s';
+  const prs = ob ? (OB.divinePronouns.length ? OB.divinePronouns : ['none']) : pronounList();
+  const map = {He:'His', She:'Her', They:'Their'};
+  const words = prs.filter(k=>map[k]).map(k=>map[k]);
+  if(words.length) return words.join('/');
+  const names = ob ? (OB.divineNames.length ? OB.divineNames : [((OB.divineCustom||'').trim() || 'the Divine')]) : divineList();
+  return names.length===1 ? names[0] + '\u2019s' : 'the Sacred';
 }
 const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','The Guru Granth Sahib','The Tao Te Ching','Sufi Poetry','A blend of many'];
 const LENS_BOOK = {Christian:'The Bible', Islamic:'The Qur\u2019an', Jewish:'The Tanakh', Hindu:'The Bhagavad Gita', Buddhist:'The Dhammapada', Mystic:'Sufi Poetry', Sikh:'The Guru Granth Sahib', Taoist:'The Tao Te Ching', 'Latino-Caribbean':'The Bible'};
@@ -648,8 +647,8 @@ const ES = {
   'Choose as many as resonate':'Elige todos los que resuenen',
   'Choose every one that resonates — there is no limit. Tap a selected one to remove it.':'Elige todos los que resuenen — no hay límite. Toca uno seleccionado para quitarlo.',
   'Primary':'Principal','Names for the sacred':'Nombres de lo sagrado','Names for the Sacred':'Nombres de lo Sagrado',
-  'Choose every name you use — many people use several. The first one you tap is the name Selah leads with.':'Elige cada nombre que uses — muchas personas usan varios. El primero que toques es el que Selah usa primero.',
-  'Choose all that fit — some people mix He and They, or sometimes just use the name. The first one leads.':'Elige todos los que encajen — algunas personas mezclan Él y Elle, o a veces solo usan el nombre. El primero lidera.',
+  'Choose every name you use — many people use several, and Selah will use them all.':'Elige cada nombre que uses — muchas personas usan varios, y Selah los usará todos.',
+  'Choose all that fit — some people mix He and They, or sometimes just use the name. Selah follows your lead.':'Elige todos los que encajen — algunas personas mezclan Él y Elle, o a veces solo usan el nombre. Selah sigue tu ejemplo.',
   'Add your own (optional)':'Añade el tuyo (opcional)','Write it here…':'Escríbelo aquí…',
   'Done':'Listo'
 };
@@ -728,7 +727,8 @@ function highlightText(text, syms){
 
 /* ---------- discernment engine (local, no network) ---------- */
 function generateDiscernment(m){
-  const dn = S.user.divineName;
+  const dnl = divineList();
+  const dn = dnl[Math.floor(Math.random()*dnl.length)];
   const name = S.user.soulName || 'Friend';
   const season = S.user.season ? seasonLabel(S.user.season) : null;
   const symNames = m.symbols.map(k=>SYMBOLS[k].name);
@@ -971,12 +971,12 @@ function viewOnboarding(){
       <label class="field-label">What should we call you?</label>
       <input id="ob-name" placeholder="Your name" value="${esc(u.soulName)}" style="margin-bottom:20px">
       <label class="field-label">What do you call the sacred?</label>
-      <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose every name you use — many people use several. The first one you tap is the name Selah leads with.</p>
-      <div id="ob-divine">${DIVINE_NAMES.map(d=>{const i=u.divineNames.indexOf(d);return `<button class="opt-card ${i>-1?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span><span style="flex:1">${d}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
+      <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose every name you use — many people use several, and Selah will use them all.</p>
+      <div id="ob-divine">${DIVINE_NAMES.map(d=>`<button class="opt-card ${u.divineNames.includes(d)?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span><span style="flex:1">${d}</span></button>`).join('')}</div>
       <input id="ob-divine-custom" placeholder="Or write your own…" value="${esc(u.divineCustom)}" style="margin-top:6px">
-      <label class="field-label" style="margin-top:20px">How do you refer to ${esc(u.divineNames[0]||u.divineCustom.trim()||'the sacred')}?</label>
-      <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose all that fit — some people mix He and They, or sometimes just use the name. The first one leads.</p>
-      <div id="ob-pron">${DEITY_PRONOUNS.map(pr=>{const i=u.divinePronouns.indexOf(pr.k);return `<button class="opt-card ${i>-1?'on':''}" data-v="${pr.k}"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
+      <label class="field-label" style="margin-top:20px">How do you refer to ${esc(u.divineNames.length===1 ? u.divineNames[0] : (u.divineNames.length===0 && u.divineCustom.trim() ? u.divineCustom.trim() : 'the sacred'))}?</label>
+      <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose all that fit — some people mix He and They, or sometimes just use the name. Selah follows your lead.</p>
+      <div id="ob-pron">${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${u.divinePronouns.includes(pr.k)?'on':''}" data-v="${pr.k}"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}</div>
     `, !!u.soulName.trim());
   }
   if(obStep===1){
@@ -2023,8 +2023,8 @@ function editDivine(){
   const list = divineList();
   const extras = list.filter(d=>!DIVINE_NAMES.includes(d));
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Names for the Sacred</h2>
-    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose every name you use — the first one is the name Selah leads with. Tap a selected one to remove it.</p>
-    ${DIVINE_NAMES.concat(extras).map(d=>{const i=list.indexOf(d);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleDivineName(${JSON.stringify(d).replace(/"/g,'&quot;')})"><span class="material-symbols-outlined">flare</span><span style="flex:1">${esc(d)}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose every name you use — Selah will use them all. Tap a selected one to remove it.</p>
+    ${DIVINE_NAMES.concat(extras).map(d=>`<button class="opt-card ${list.includes(d)?'on':''}" onclick="toggleDivineName(${JSON.stringify(d).replace(/"/g,'&quot;')})"><span class="material-symbols-outlined">flare</span><span style="flex:1">${esc(d)}</span></button>`).join('')}
     <label class="field-label" style="margin-top:10px">Add your own (optional)</label>
     <input id="divine-custom-edit" placeholder="Write it here…">
     <button class="grad-btn" style="margin-top:14px" onclick="addCustomDivine()">Done</button>`);
@@ -2045,8 +2045,8 @@ function addCustomDivine(){
 function editPronoun(){
   const list = pronounList();
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">How You Refer to the Sacred</h2>
-    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose all that fit — some people mix He and They, or sometimes just use the name itself. The first one leads, and Selah follows everywhere, including how your gifts are named. Tap a selected one to remove it.</p>
-    ${DEITY_PRONOUNS.map(pr=>{const i=list.indexOf(pr.k);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleDivinePronoun('${pr.k}')"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose all that fit — some people mix He and They, or sometimes just use the name itself. Selah follows your lead everywhere, including how your gifts are named. Tap a selected one to remove it.</p>
+    ${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${list.includes(pr.k)?'on':''}" onclick="toggleDivinePronoun('${pr.k}')"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}
     <button class="grad-btn" style="margin-top:14px" onclick="closeModal();render()">Done</button>`);
 }
 function toggleDivinePronoun(k){
