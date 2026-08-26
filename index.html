@@ -341,7 +341,7 @@ const store = {
 /* ---------- state ---------- */
 let S = store.get() || {
   auth:null, onboarded:false,
-  user:{ soulName:'', divineName:'The Divine', lens:'Universal', explorer:true,
+  user:{ soulName:'', divineName:'The Divine', divinePronoun:'none', lens:'Universal', explorer:true,
     comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
     gifts:[], growth:[], relational:'', season:'', processing:'', tier:'free' },
   moments:[], petitions:[], rituals:[], revelations:{}, pulse:[], pulseActs:{},
@@ -356,6 +356,7 @@ if(Array.isArray(S.user.lenses)) S.user.lenses = S.user.lenses.map(l=>l==='Afric
 if(typeof S.user.relational==='string') S.user.relational = S.user.relational ? [S.user.relational] : [];
 if(!Array.isArray(S.user.relational)) S.user.relational = [];
 if(!S.lang) S.lang='en';
+if(!S.user.divinePronoun) S.user.divinePronoun='none';
 save();
 
 /* ---------- lens translation maps ---------- */
@@ -392,6 +393,21 @@ const SEASONS_MAP = {
   'Rebuilding':{Christian:'Restoration', Islamic:'Islah (Repair)', Jewish:'Tikkun (Mending)', Buddhist:'Beginning Again', Hindu:'Punar Nirman', 'Afro-Spirituality':'Raising the House', Indigenous:'New Fire', Mystic:'Reformation', 'New Age / Metaphysical':'Recalibration', Universal:'Rebuilding'}
 };
 const DIVINE_NAMES = ['God','The Divine','Source','Spirit','The Universe','The Most High','Creator'];
+const DEITY_PRONOUNS = [
+  {k:'none', label:'By Name Only', sub:'No gendered pronouns, just the name you chose'},
+  {k:'He', label:'He / Him', sub:''},
+  {k:'She', label:'She / Her', sub:''},
+  {k:'They', label:'They / Them', sub:''}
+];
+function deityPossessive(){
+  const u = (typeof OB!=='undefined' && !S.onboarded) ? OB : S.user;
+  const pr = u.divinePronoun || 'none';
+  if(pr==='He') return 'His';
+  if(pr==='She') return 'Her';
+  if(pr==='They') return 'Their';
+  const nm = (u.divineCustom && u.divineCustom.trim()) || u.divineName || 'the Divine';
+  return nm + '\u2019s';
+}
 const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','The Guru Granth Sahib','The Tao Te Ching','Sufi Poetry','A blend of many'];
 const LENS_BOOK = {Christian:'The Bible', Islamic:'The Qur\u2019an', Jewish:'The Tanakh', Hindu:'The Bhagavad Gita', Buddhist:'The Dhammapada', Mystic:'Sufi Poetry', Sikh:'The Guru Granth Sahib', Taoist:'The Tao Te Ching', 'Latino-Caribbean':'The Bible'};
 function userBook(){
@@ -403,7 +419,8 @@ function seasonLabel(s){ const m = SEASONS_MAP[s]; return m ? (m[S.user.lens]||s
 function giftLabel(g, lens){
   lens = lens || S.user.lens;
   if(METAPHYSICAL_LENSES.includes(lens)) return g;
-  return (GIFT_LENS[lens]||{})[g] || PLAIN_GIFTS[g] || g;
+  const lbl = (GIFT_LENS[lens]||{})[g] || PLAIN_GIFTS[g] || g;
+  return lbl.replace(/\bHis\b/g, deityPossessive());
 }
 /* UI vocabulary that adapts to the user's lens */
 const VOCAB = {
@@ -606,7 +623,15 @@ const ES = {
   'Listening… speak your dream or moment.':'Escuchando… habla tu sueño o momento.',
   'Voice input is not supported in this browser yet. Chrome and Safari work best.':'La entrada de voz aún no funciona en este navegador. Chrome y Safari funcionan mejor.',
   'Selah needs microphone permission to hear you.':'Selah necesita permiso del micrófono para escucharte.',
-  'That image could not be read. Try another one.':'No se pudo leer esa imagen. Prueba con otra.'
+  'That image could not be read. Try another one.':'No se pudo leer esa imagen. Prueba con otra.',
+  'By Name Only':'Solo por Nombre','He / Him':'Él','She / Her':'Ella','They / Them':'Elle',
+  'No gendered pronouns, just the name you chose':'Sin pronombres de género, solo el nombre que elegiste',
+  'How you refer to the sacred':'Cómo te refieres a lo sagrado',
+  'How You Refer to the Sacred':'Cómo Te Refieres a lo Sagrado',
+  'Your gifts':'Tus dones','Your Gifts':'Tus Dones',
+  'Choose as many as resonate':'Elige todos los que resuenen',
+  'Choose every one that resonates — there is no limit. Tap a selected one to remove it.':'Elige todos los que resuenen — no hay límite. Toca uno seleccionado para quitarlo.',
+  'Done':'Listo'
 };
 const ES_RX = [
   [/^(\d+) Answered$/, '$1 Respondidas'],
@@ -615,7 +640,9 @@ const ES_RX = [
   [/^(\d+) Days$/, '$1 Días'],
   [/^(\d+) symbols? found$/, '$1 símbolo(s) hallados'],
   [/^Getting to know you · Step (\d+) of 7$/, 'Conociéndote · Paso $1 de 7'],
-  [/^Unlimited (.+)s · Pro included free during testing$/, '$1 sin límite · Pro incluido gratis durante las pruebas']
+  [/^Unlimited (.+)s · Pro included free during testing$/, '$1 sin límite · Pro incluido gratis durante las pruebas'],
+  [/^How do you refer to (.+)\?$/, '¿Cómo te refieres a $1?'],
+  [/^(\d+) chosen · tap to change$/, '$1 elegidos · toca para cambiar']
 ];
 function LT(t){
   if(S.lang!=='es' || !t) return t;
@@ -885,7 +912,7 @@ function wireAuth(){
 /* ================= ONBOARDING ================= */
 let obStep = 0;
 const OB = {
-  lenses:[], customLens:'', explorer:false, soulName:'', divineName:'The Divine', divineCustom:'',
+  lenses:[], customLens:'', explorer:false, soulName:'', divineName:'The Divine', divineCustom:'', divinePronoun:'none',
   holyBook:'auto', holyBookCustom:'',
   comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
   gifts:[], relational:[], season:'', processing:[]
@@ -926,6 +953,8 @@ function viewOnboarding(){
       <label class="field-label">What do you call the sacred?</label>
       <div id="ob-divine">${DIVINE_NAMES.map(d=>`<button class="opt-card ${u.divineName===d && !u.divineCustom?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span>${d}</button>`).join('')}</div>
       <input id="ob-divine-custom" placeholder="Or write your own…" value="${esc(u.divineCustom)}" style="margin-top:6px">
+      <label class="field-label" style="margin-top:20px">How do you refer to ${esc(u.divineCustom.trim()||u.divineName)}?</label>
+      <div id="ob-pron">${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${u.divinePronoun===pr.k?'on':''}" data-v="${pr.k}"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}</div>
     `, !!u.soulName.trim());
   }
   if(obStep===1){
@@ -1003,6 +1032,7 @@ function wireOnboarding(){
   const pickOne = (id, set)=>{ const el=document.getElementById(id); if(!el) return;
     el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{ set(b.dataset.v); render(); }); };
   pickOne('ob-divine', v=>{ OB.divineName=v; OB.divineCustom=''; });
+  pickOne('ob-pron', v=>OB.divinePronoun=v);
   pickOne('ob-season', v=>OB.season=v);
   const pickMany = (id, arr)=>{ const el=document.getElementById(id); if(!el) return;
     el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{
@@ -1027,6 +1057,7 @@ function wireOnboarding(){
     S.user = {...S.user,
       soulName: OB.soulName.trim(),
       divineName: OB.divineCustom.trim() || OB.divineName,
+      divinePronoun: OB.divinePronoun || 'none',
       lens: obPrimaryLens(),
       lenses: OB.lenses.length ? OB.lenses.slice() : ['Universal'],
       customLens: OB.customLens.trim(),
@@ -1911,6 +1942,8 @@ function viewSoul(){
         ${soulRow('language','App Language', S.lang==='es'?'Español':'English', 'editLang()')}
         ${soulRow('translate','Wisdom lens', u.lens, 'editLens()')}
         ${soulRow('flare','Name for the sacred', u.divineName, 'editDivine()')}
+        ${soulRow('record_voice_over','How you refer to the sacred', (DEITY_PRONOUNS.find(pr=>pr.k===(u.divinePronoun||'none'))||DEITY_PRONOUNS[0]).label, 'editPronoun()')}
+        ${soulRow('auto_awesome','Your gifts', (u.gifts||[]).length? u.gifts.length+' chosen · tap to change' : 'Choose as many as resonate', 'editGifts()')}
         ${soulRow('tune','Comfort matrix', 'Adjust what Selah shows', 'editComfort()')}
         ${soulRow('menu_book','Sacred text', esc(userBook()), 'editBook()')}
         ${soulRow('shield_with_heart','Private Vault', S.vaultPin===null?'Set a PIN':'Locked · tap to open', "go('vault')")}
@@ -1965,6 +1998,23 @@ function toggleLens(l){
 function editDivine(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Name for the Sacred</h2>
     ${DIVINE_NAMES.map(d=>`<button class="opt-card ${S.user.divineName===d?'on':''}" onclick="S.user.divineName='${d}';save();closeModal();render()"><span class="material-symbols-outlined">flare</span>${d}</button>`).join('')}`);
+}
+function editPronoun(){
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">How You Refer to the Sacred</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Some people say He, some say She or They, and some simply use the name itself. Selah follows your lead everywhere, including how your gifts are named.</p>
+    ${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${(S.user.divinePronoun||'none')===pr.k?'on':''}" onclick="S.user.divinePronoun='${pr.k}';save();closeModal();render()"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}`);
+}
+function editGifts(){
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Gifts</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose every one that resonates — there is no limit. Tap a selected one to remove it.</p>
+    ${CLAIRS.map(c=>{const on=(S.user.gifts||[]).includes(c.k);const info=CLAIR_INFO[c.k];return `<button class="opt-card ${on?'on':''}" onclick="toggleGift('${c.k}')"><span class="material-symbols-outlined">${c.icon}</span><span style="flex:1">${giftLabel(c.k)}<small>${info.desc}</small></span></button>`;}).join('')}
+    <button class="grad-btn" style="margin-top:14px" onclick="closeModal();render()">Done</button>`);
+}
+function toggleGift(k){
+  S.user.gifts = S.user.gifts || [];
+  const i = S.user.gifts.indexOf(k);
+  if(i>-1) S.user.gifts.splice(i,1); else S.user.gifts.push(k);
+  save(); editGifts();
 }
 function editComfort(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Comfort Matrix</h2>
@@ -2131,6 +2181,7 @@ const BK = {
       user: {
         name: S.user.soulName, lens: lensLabel(S.user.lens), lenses: (S.user.lenses||[S.user.lens]).map(lensLabel),
         custom_lens: S.user.customLens||null, divine_name: S.user.divineName,
+        divine_pronoun: S.user.divinePronoun||'none',
         holy_book: userBook(),
         season: S.user.season ? seasonLabel(S.user.season) : null,
         gifts: (S.user.gifts||[]).map(g=>giftLabel(g)), comfort: S.user.comfort,
