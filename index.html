@@ -345,7 +345,7 @@ let S = store.get() || {
     comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
     gifts:[], growth:[], relational:'', season:'', processing:'', tier:'free' },
   moments:[], petitions:[], rituals:[], revelations:{}, pulse:[], pulseActs:{},
-  vaultPin:null, calm:false, discernsToday:{date:'',count:0}, streak:[]
+  vaultPin:null, calm:false, discernsToday:{date:'',count:0}, streak:[], lang:'en'
 };
 function save(){ store.set(S); if(window.BK && BK.on && BK.session) BK.schedulePush(); }
 /* Testing phase: every soul gets Pro free */
@@ -355,6 +355,7 @@ if(S.user.lens==='African Traditional') S.user.lens='Afro-Spirituality';
 if(Array.isArray(S.user.lenses)) S.user.lenses = S.user.lenses.map(l=>l==='African Traditional'?'Afro-Spirituality':l);
 if(typeof S.user.relational==='string') S.user.relational = S.user.relational ? [S.user.relational] : [];
 if(!Array.isArray(S.user.relational)) S.user.relational = [];
+if(!S.lang) S.lang='en';
 save();
 
 /* ---------- lens translation maps ---------- */
@@ -562,11 +563,91 @@ function dailyText(){
   return pool[day % pool.length];
 }
 
+/* ---------- language (i18n) ---------- */
+const LANGS = [{k:'en',label:'English'},{k:'es',label:'Español'}];
+function setLang(k){ S.lang=k; save(); render(); }
+const ES = {
+  'Home':'Inicio','Rituals':'Rituales','Together':'Juntos','Profile':'Perfil',
+  'Good morning':'Buenos días','Good afternoon':'Buenas tardes','Good evening':'Buenas noches',
+  'Up early, or up late?':'¿Madrugando o trasnochando?',
+  'Your':'Tu','Streak':'Racha','Begins Today':'Comienza Hoy',
+  'Begin a Selah Moment':'Comienza un Momento Selah',
+  'Your Clarity':'Tu Claridad','Clarity level':'Nivel de claridad','Top gift':'Don principal',
+  'In a strong rhythm':'En buen ritmo','Finding your rhythm':'Encontrando tu ritmo','Easing back in':'Retomando el paso',
+  'Latest Moment':'Último Momento','Dream Log':'Registro de Sueños','Waking Moment':'Momento Despierto',
+  'Your First Awaits':'El Primero Te Espera','Start One':'Comienza Una',
+  'Journal':'Diario','Canvas':'Lienzo','Capture the stream':'Captura lo que fluye',
+  'How it felt':'Cómo se sintió','tap one':'elige una','What happened':'Qué pasó',
+  'Sadness':'Tristeza','Anxiety':'Ansiedad','Awe':'Asombro','Peace':'Paz','Joy':'Alegría',
+  'Save this Moment':'Guardar este Momento',
+  'Speak it instead':'Háblalo en voz alta','Add a photo of what you saw':'Añade una foto de lo que viste',
+  'I just woke up. It was so vivid…':'Acabo de despertar. Fue tan vívido…',
+  'Something just happened that I need to sit with…':'Algo acaba de pasar y necesito contemplarlo…',
+  'Ask Selah to Discern':'Pide a Selah Discernimiento','Ask Selah to Reflect':'Pide a Selah una Reflexión',
+  'Spiritual Gifts':'Dones Espirituales','Clair Senses':'Sentidos Clari','How It Came to You':'Cómo Te Llegó',
+  'Questions to Sit With':'Preguntas para Contemplar','Discernment':'Discernimiento','Reflection':'Reflexión',
+  'Prayer Requests':'Peticiones de Oración','Answered Prayers':'Oraciones Respondidas',
+  'Active Intentions':'Intenciones Activas','Intentions':'Intenciones','Good News':'Buenas Noticias',
+  'Praise Reports':'Testimonios','Prayer Wall':'Muro de Oración',
+  'Email':'Correo','Phone':'Teléfono','Send me a code':'Envíame un código',
+  'Check your inbox':'Revisa tu correo','Check your messages':'Revisa tus mensajes',
+  'Sign in':'Iniciar sesión','First time here? Signing in creates your space.':'¿Primera vez aquí? Iniciar sesión crea tu espacio.',
+  'Welcome':'Bienvenida/o','Your traditions':'Tus tradiciones','Your comfort level':'Tu nivel de comodidad',
+  'How insight reaches you':'Cómo te llega la percepción','Back':'Atrás','Continue':'Continuar',
+  'What should we call you?':'¿Cómo te llamamos?','What do you call the sacred?':'¿Cómo llamas a lo sagrado?',
+  'Your name':'Tu nombre','Or write your own…':'O escribe el tuyo…',
+  'App Language':'Idioma de la App','Wisdom lens':'Lente de sabiduría','Name for the sacred':'Nombre de lo sagrado',
+  'Comfort matrix':'Matriz de comodidad','Sacred text':'Texto sagrado','Private Vault':'Bóveda Privada',
+  'Calm mode':'Modo calma','Export Selah Book':'Exportar Libro Selah','Set a PIN':'Crea un PIN',
+  'Saved. Selah.':'Guardado. Selah.','Write a few words first.':'Escribe unas palabras primero.',
+  'Write a few words or add a photo first.':'Escribe unas palabras o añade una foto primero.',
+  'Write or speak your stream first. Selah listens to what you notice.':'Escribe o habla primero. Selah escucha lo que notas.',
+  'Photo added. Selah will look at it with you.':'Foto añadida. Selah la mirará contigo.',
+  'Listening… speak your dream or moment.':'Escuchando… habla tu sueño o momento.',
+  'Voice input is not supported in this browser yet. Chrome and Safari work best.':'La entrada de voz aún no funciona en este navegador. Chrome y Safari funcionan mejor.',
+  'Selah needs microphone permission to hear you.':'Selah necesita permiso del micrófono para escucharte.',
+  'That image could not be read. Try another one.':'No se pudo leer esa imagen. Prueba con otra.'
+};
+const ES_RX = [
+  [/^(\d+) Answered$/, '$1 Respondidas'],
+  [/^(\d+) Active$/, '$1 Activas'],
+  [/^1 Day$/, '1 Día'],
+  [/^(\d+) Days$/, '$1 Días'],
+  [/^(\d+) symbols? found$/, '$1 símbolo(s) hallados'],
+  [/^Getting to know you · Step (\d+) of 7$/, 'Conociéndote · Paso $1 de 7'],
+  [/^Unlimited (.+)s · Pro included free during testing$/, '$1 sin límite · Pro incluido gratis durante las pruebas']
+];
+function LT(t){
+  if(S.lang!=='es' || !t) return t;
+  const m = String(t).match(/^(\s*)([\s\S]*?)(\s*)$/);
+  const core = m[2];
+  if(ES[core]) return m[1] + ES[core] + m[3];
+  for(const [rx, rp] of ES_RX){ if(rx.test(core)) return m[1] + core.replace(rx, rp) + m[3]; }
+  return t;
+}
+function translateDOM(root){
+  if(S.lang!=='es' || !root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      const el = n.parentElement;
+      if(!el || el.closest('.material-symbols-outlined') || el.closest('script,style')) return NodeFilter.FILTER_REJECT;
+      return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes = []; while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n=>{ const t = LT(n.nodeValue); if(t !== n.nodeValue) n.nodeValue = t; });
+  root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>{
+    ['placeholder','title','aria-label'].forEach(a=>{
+      const v = el.getAttribute(a); if(v){ const t = LT(v); if(t!==v) el.setAttribute(a, t); }
+    });
+  });
+}
+
 /* ---------- helpers ---------- */
 function esc(t){ return String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function todayKey(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDate(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
-function toast(msg, ms){ const t=document.getElementById('toast'); t.innerHTML=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), ms||2600); }
+function toast(msg, ms){ const t=document.getElementById('toast'); t.innerHTML=LT(msg); t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), ms||2600); }
 function initialOf(){ return (S.user.soulName||'S').trim().charAt(0).toUpperCase(); }
 function markStreak(){ const k=todayKey(); if(!S.streak.includes(k)){ S.streak.push(k); } }
 function streakCount(){
@@ -691,8 +772,8 @@ function go(r, arg){
 function vaultOpenGuard(r){ if(r!=='vault' && r!=='vaultlist') vaultOpen=false; }
 function render(arg){
   document.body.classList.toggle('calm', !!S.calm);
-  if(!S.auth){ app.innerHTML = viewAuth(); wireAuth(); return; }
-  if(!S.onboarded){ app.innerHTML = viewOnboarding(); wireOnboarding(); return; }
+  if(!S.auth){ app.innerHTML = viewAuth(); wireAuth(); translateDOM(app); return; }
+  if(!S.onboarded){ app.innerHTML = viewOnboarding(); wireOnboarding(); translateDOM(app); return; }
   const views = {home:viewHome, journal:viewJournal, space:viewSpace, library:viewLibrary,
     pulse:viewPulse, soul:viewSoul, petitions:viewPetitions, victories:viewVictories,
     ritual:viewRitualLog, vault:viewVaultPin, vaultlist:viewVaultList, moments:viewMoments};
@@ -700,6 +781,7 @@ function render(arg){
   app.innerHTML = fn(arg);
   const wires = {journal:wireJournal, vault:wireVaultPin, ritual:wireRitual, library:wireLibrary};
   if(wires[route]) wires[route](arg);
+  translateDOM(app);
 }
 
 /* ================= AUTH ================= */
@@ -721,6 +803,7 @@ function viewAuth(){
     <div style="text-align:center;margin-bottom:34px">
       <div class="auth-name"><span>Se</span><span class="lah">lah</span></div>
       <p class="tagline" style="margin-top:10px">PAUSE • REFLECT • DISCERN</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:18px">${LANGS.map(l=>`<button onclick="setLang('${l.k}')" style="background:${S.lang===l.k?'rgba(43,238,227,.15)':'none'};border:1px solid ${S.lang===l.k?'rgba(43,238,227,.5)':'rgba(255,255,255,.15)'};color:${S.lang===l.k?'var(--teal)':'var(--ink-50)'};border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer">${l.label}</button>`).join('')}</div>
     </div>
     <div style="width:100%;max-width:360px">
       <div class="method-toggle">
@@ -836,6 +919,8 @@ function viewOnboarding(){
     return obShell(`
       <h1 class="screen-title" style="margin-bottom:6px">Welcome</h1>
       <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:24px">Selah adapts to you: your language, your traditions, your comfort level. A few questions get that right. There are no wrong answers, and you can change any of this later.</p>
+      <label class="field-label">App language · Idioma</label>
+      <div style="display:flex;gap:10px;margin-bottom:20px">${LANGS.map(l=>`<button class="opt-card ${S.lang===l.k?'on':''}" style="flex:1" onclick="setLang('${l.k}')"><span class="material-symbols-outlined">language</span>${l.label}</button>`).join('')}</div>
       <label class="field-label">What should we call you?</label>
       <input id="ob-name" placeholder="Your name" value="${esc(u.soulName)}" style="margin-bottom:20px">
       <label class="field-label">What do you call the sacred?</label>
@@ -1112,7 +1197,7 @@ function confirmAsk(msg){ return window.confirm(msg); }
 
 /* ================= JOURNAL CANVAS ================= */
 let J = null;
-function resetJ(){ J = {type:'waking', emotion:null, clairs:[], text:'', symbols:[], reflection:null, questions:[]}; }
+function resetJ(){ J = {type:'waking', emotion:null, clairs:[], text:'', symbols:[], reflection:null, questions:[], photo:null}; }
 function viewJournal(){
   if(!J) resetJ();
   return `<header class="app-header">
@@ -1136,8 +1221,10 @@ function viewJournal(){
     </div>
 
     <div class="section">
-      <div class="section-head"><span class="eyebrow">What happened</span><span class="chip" id="sym-count" style="${J.symbols.length?'':'visibility:hidden'}"><span class="material-symbols-outlined" style="font-size:12px">verified</span>${J.symbols.length} symbol${J.symbols.length===1?'':'s'} found</span></div>
+      <div class="section-head"><span style="display:flex;align-items:center;gap:8px"><span class="eyebrow">What happened</span><button class="icon-mini" id="mic-btn" title="Speak it instead" style="width:30px;height:30px"><span class="material-symbols-outlined" style="font-size:17px">mic</span></button><button class="icon-mini" id="cam-btn" title="Add a photo of what you saw" style="width:30px;height:30px"><span class="material-symbols-outlined" style="font-size:17px">photo_camera</span></button></span><span class="chip" id="sym-count" style="${J.symbols.length?'':'visibility:hidden'}"><span class="material-symbols-outlined" style="font-size:12px">verified</span>${J.symbols.length} symbol${J.symbols.length===1?'':'s'} found</span></div>
       <textarea id="jr-text" class="jr-textarea" placeholder="${J.type==='dream'?'I just woke up. It was so vivid…':'Something just happened that I need to sit with…'}">${esc(J.text)}</textarea>
+      <input type="file" id="jr-photo-input" accept="image/*" capture="environment" style="display:none">
+      ${J.photo?`<div style="margin-top:12px;position:relative;display:inline-block"><img src="${J.photo}" alt="Your photo" style="max-width:150px;max-height:150px;border-radius:14px;border:1px solid rgba(43,238,227,.35);display:block"><button class="icon-mini" onclick="J.photo=null;render()" style="position:absolute;top:-8px;right:-8px;width:26px;height:26px;background:rgba(10,8,20,.95)"><span class="material-symbols-outlined" style="font-size:14px">close</span></button></div>`:''}
       <div class="sym-found" id="sym-chips">${J.symbols.map(s=>`<span class="chip"><span class="material-symbols-outlined" style="font-size:12px">${SYMBOLS[s].icon}</span>${esc(SYMBOLS[s].name)}</span>`).join('')}</div>
       <div id="crisis-slot" style="margin-top:14px">${J.crisis?crisisCard():''}</div>
     </div>
@@ -1168,6 +1255,52 @@ function crisisCard(){
     Your words here stay private on this device.
   </div>`;
 }
+/* ---------- voice + photo entry ---------- */
+let dictation = null;
+function toggleDictation(btn){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ toast('Voice input is not supported in this browser yet. Chrome and Safari work best.'); return; }
+  if(dictation){ dictation.stop(); return; }
+  const rec = new SR();
+  rec.lang = S.lang==='es' ? 'es-US' : 'en-US';
+  rec.continuous = true; rec.interimResults = true;
+  const base = (document.getElementById('jr-text')||{value:''}).value;
+  rec.onresult = (e)=>{
+    let finals='', interim='';
+    for(let i=0;i<e.results.length;i++){ const r=e.results[i]; if(r.isFinal) finals+=r[0].transcript; else interim+=r[0].transcript; }
+    const el = document.getElementById('jr-text'); if(!el) return;
+    el.value = (base + (base?' ':'') + finals + interim).replace(/ {2,}/g,' ');
+    el.dispatchEvent(new Event('input'));
+  };
+  rec.onend = ()=>{
+    dictation = null;
+    const b = document.getElementById('mic-btn');
+    if(b){ b.style.background=''; b.style.borderColor=''; const ic=b.querySelector('.material-symbols-outlined'); if(ic) ic.textContent='mic'; }
+  };
+  rec.onerror = (e)=>{ if(e.error==='not-allowed') toast('Selah needs microphone permission to hear you.'); };
+  dictation = rec;
+  btn.style.background='rgba(238,43,110,.28)'; btn.style.borderColor='rgba(238,43,110,.6)';
+  const ic = btn.querySelector('.material-symbols-outlined'); if(ic) ic.textContent='stop';
+  toast('Listening… speak your dream or moment.');
+  rec.start();
+}
+function attachPhoto(file){
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = ()=>{
+    const MAX = 640;
+    let w = img.width, h = img.height;
+    if(Math.max(w,h) > MAX){ const s = MAX/Math.max(w,h); w = Math.round(w*s); h = Math.round(h*s); }
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    J.photo = c.toDataURL('image/jpeg', 0.72);
+    URL.revokeObjectURL(url);
+    render();
+    toast('Photo added. Selah will look at it with you.');
+  };
+  img.onerror = ()=>{ URL.revokeObjectURL(url); toast('That image could not be read. Try another one.'); };
+  img.src = url;
+}
 function wireJournal(){
   const ta = document.getElementById('jr-text');
   ta.addEventListener('input', ()=>{
@@ -1180,6 +1313,12 @@ function wireJournal(){
     document.getElementById('sym-chips').innerHTML = J.symbols.map(s=>`<span class="chip"><span class="material-symbols-outlined" style="font-size:12px">${SYMBOLS[s].icon}</span>${esc(SYMBOLS[s].name)}</span>`).join('');
     document.getElementById('crisis-slot').innerHTML = J.crisis?crisisCard():'';
   });
+  const mic = document.getElementById('mic-btn');
+  if(mic) mic.onclick = ()=>toggleDictation(mic);
+  const cam = document.getElementById('cam-btn');
+  const photoInput = document.getElementById('jr-photo-input');
+  if(cam && photoInput) cam.onclick = ()=>photoInput.click();
+  if(photoInput) photoInput.onchange = ()=>{ const f = photoInput.files && photoInput.files[0]; if(f) attachPhoto(f); };
   document.querySelectorAll('[data-clair]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.clair;
     J.clairs = J.clairs.includes(k) ? J.clairs.filter(x=>x!==k) : [...J.clairs,k];
@@ -1187,7 +1326,7 @@ function wireJournal(){
   });
   const db = document.getElementById('discern-btn');
   if(db) db.onclick = async ()=>{
-    if(!J.text.trim()){ toast('Write or speak your stream first. Selah listens to what you notice.'); return; }
+    if(!J.text.trim() && !J.photo){ toast('Write or speak your stream first. Selah listens to what you notice.'); return; }
     if(!canDiscern()){ openPaywall(); return; }
     S.discernsToday.count++; save();
     let out = null;
@@ -1202,10 +1341,10 @@ function wireJournal(){
     render(); window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
   };
   document.getElementById('save-moment').onclick = ()=>{
-    if(!J.text.trim()){ toast('Write a few words first.'); return; }
+    if(!J.text.trim() && !J.photo){ toast('Write a few words or add a photo first.'); return; }
     S.moments.unshift({ id:'m'+Date.now(), type:J.type, text:J.text, emotion:J.emotion,
       clairs:J.clairs, symbols:J.symbols, reflection:J.reflection, questions:J.questions,
-      vault:false, createdAt:new Date().toISOString() });
+      photo:J.photo||null, vault:false, createdAt:new Date().toISOString() });
     markStreak(); save(); resetJ();
     go('home'); toast('Saved. Selah.');
   };
@@ -1689,6 +1828,7 @@ function viewVaultList(){
 function openModal(html){
   const v = document.getElementById('modal-veil');
   document.getElementById('modal-card').innerHTML = `<button class="modal-close" onclick="closeModal()"><span class="material-symbols-outlined">close</span></button>` + html;
+  translateDOM(document.getElementById('modal-card'));
   v.classList.add('open');
 }
 function closeModal(){ document.getElementById('modal-veil').classList.remove('open'); }
@@ -1768,6 +1908,7 @@ function viewSoul(){
     <section class="section">
       <div class="section-head"><span class="eyebrow">Settings</span></div>
       <div class="glass" style="border-radius:22px;overflow:hidden">
+        ${soulRow('language','App Language', S.lang==='es'?'Español':'English', 'editLang()')}
         ${soulRow('translate','Wisdom lens', u.lens, 'editLens()')}
         ${soulRow('flare','Name for the sacred', u.divineName, 'editDivine()')}
         ${soulRow('tune','Comfort matrix', 'Adjust what Selah shows', 'editComfort()')}
@@ -1787,6 +1928,13 @@ function viewSoul(){
       <button class="ghost-btn" style="color:var(--danger);border-color:rgba(255,93,122,.3)" onclick="signOut()"><span class="material-symbols-outlined" style="font-size:18px">logout</span>Sign out</button>
     </section>
   </main>` + navBar('soul');
+}
+function editLang(){
+  openModal(`
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">App Language</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:18px;line-height:1.6">Selah speaks with you in the language you choose, and you can write or speak your entries in it too.</p>
+    ${LANGS.map(l=>`<button class="opt-card ${S.lang===l.k?'on':''}" onclick="setLang('${l.k}');closeModal()"><span class="material-symbols-outlined">language</span>${l.label}</button>`).join('')}
+  `);
 }
 function soulRow(icon,title,sub,fn){
   return `<button style="display:flex;align-items:center;gap:14px;width:100%;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.05);padding:16px 18px;cursor:pointer;text-align:left;color:#fff" onclick="${fn}">
@@ -1977,6 +2125,7 @@ const BK = {
   async discern(J){
     const packet = {
       entry_type: J.type, text: J.text, emotion: J.emotion,
+      lang: S.lang || 'en', photo: J.photo || null,
       clairs: J.clairs.map(c=>({ key:c, label:giftLabel(c) })),
       symbols: J.symbols.map(k=>({ key:k, name:SYMBOLS[k].name, meaning:SYMBOLS[k].meaning })),
       user: {
