@@ -349,10 +349,16 @@ let S = store.get() || {
 };
 function save(){ store.set(S); if(window.BK && BK.on && BK.session) BK.schedulePush(); }
 /* Testing phase: every soul gets Pro free */
-S.user.tier = 'pro'; save();
+S.user.tier = 'pro';
+/* Migrations for earlier test builds */
+if(S.user.lens==='African Traditional') S.user.lens='Afro-Spirituality';
+if(Array.isArray(S.user.lenses)) S.user.lenses = S.user.lenses.map(l=>l==='African Traditional'?'Afro-Spirituality':l);
+if(typeof S.user.relational==='string') S.user.relational = S.user.relational ? [S.user.relational] : [];
+if(!Array.isArray(S.user.relational)) S.user.relational = [];
+save();
 
 /* ---------- lens translation maps ---------- */
-const LENSES = ['Christian','Islamic','Jewish','Buddhist','Hindu','African Traditional','Indigenous','Mystic','New Age / Metaphysical','Universal'];
+const LENSES = ['Christian','Islamic','Jewish','Buddhist','Hindu','Afro-Spirituality','Indigenous','Mystic','New Age / Metaphysical','Universal'];
 const PLAIN_GIFTS = {'Clairvoyance':'Seeing','Clairaudience':'Hearing','Clairsentience':'Gut Sense','Clairempathy':'Feeling Others','Claircognizance':'Just Knowing','Clairgustance':'Taste Sense','Clairsalience':'Scent Sense','Clairtangency':'Touch Sense','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dreamed It Before'};
 const GIFT_LENS = {
   Christian:{'Clairvoyance':'Visions','Clairaudience':'Hearing His Voice','Clairsentience':'Discernment','Clairempathy':'Burden Bearing','Claircognizance':'Word of Knowledge','Clairgustance':'Taste Impressions','Clairsalience':'Scent Impressions','Clairtangency':'Touch Impressions','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dream Echo'},
@@ -360,19 +366,19 @@ const GIFT_LENS = {
   Jewish:{'Clairvoyance':'Chazon (Vision)','Clairaudience':'Bat Kol','Clairsentience':'Binah (Understanding)','Claircognizance':"Da'at (Knowing)"},
   Buddhist:{'Clairvoyance':'Clear Seeing','Clairaudience':'Deep Listening','Clairsentience':'Felt Awareness','Claircognizance':'Direct Knowing'},
   Hindu:{'Clairvoyance':'Divya Drishti','Clairaudience':'Divya Shrotra','Clairsentience':'Subtle Feeling','Claircognizance':'Pratibha'},
-  'African Traditional':{'Clairvoyance':'Second Sight','Clairaudience':'Ancestral Hearing','Clairsentience':'Body Knowing','Claircognizance':'Deep Knowing'},
+  'Afro-Spirituality':{'Clairvoyance':'Second Sight','Clairaudience':'Ancestral Hearing','Clairsentience':'Body Knowing','Claircognizance':'Deep Knowing'},
   Indigenous:{'Clairvoyance':'Vision Keeping','Clairaudience':'Spirit Listening','Clairsentience':'Earth Feeling','Claircognizance':'Original Knowing'},
   Mystic:{}, 'New Age / Metaphysical':{}, Universal:{}
 };
 const METAPHYSICAL_LENSES = ['New Age / Metaphysical','Mystic'];
 const SEASONS = ['Wilderness','Waiting','Awakening','Harvest','Rebuilding','Dark Night'];
 const SEASONS_MAP = {
-  'Wilderness':{Christian:'The Wilderness', Islamic:'Sabr (Patient Endurance)', Jewish:'Bamidbar (In the Desert)', Buddhist:'The Charnel Ground', Hindu:'Vanaprastha Passage', 'African Traditional':'The Crossroads', Indigenous:'The Vision Quest', Mystic:'The Desert of the Soul', 'New Age / Metaphysical':'The Void', Universal:'The Wilderness'},
-  'Dark Night':{Christian:'Dark Night of the Soul', Islamic:'Qabd (Contraction)', Jewish:'Hester Panim', Buddhist:'The Great Doubt', Hindu:'Tamas Passage', 'African Traditional':'The Deep Water', Indigenous:'The Long Winter', Mystic:'Dark Night of the Soul', 'New Age / Metaphysical':'Shadow Integration', Universal:'The Dark Night'},
-  'Awakening':{Christian:'Revival', Islamic:'Yaqzah (Awakening)', Jewish:'Hitorerut', Buddhist:'Bodhi Stirring', Hindu:'Kundalini Rising', 'African Traditional':'The Calling', Indigenous:'First Light', Mystic:'Illumination', 'New Age / Metaphysical':'Ascension', Universal:'Awakening'},
-  'Harvest':{Christian:'The Harvest', Islamic:'Barakah (Abundance)', Jewish:'Sukkot Season', Buddhist:'Ripened Karma', Hindu:'Phala (Fruition)', 'African Traditional':'First Fruits', Indigenous:'The Gathering', Mystic:'Union', 'New Age / Metaphysical':'Manifestation', Universal:'Harvest'},
-  'Waiting':{Christian:'The Waiting Room', Islamic:'Tawakkul (Trusting Reliance)', Jewish:'Kavanah of Patience', Buddhist:'Sitting with What Is', Hindu:'Titiksha (Forbearance)', 'African Traditional':'Listening Time', Indigenous:'The Still Season', Mystic:'Holy Indifference', 'New Age / Metaphysical':'Divine Timing', Universal:'Waiting'},
-  'Rebuilding':{Christian:'Restoration', Islamic:'Islah (Repair)', Jewish:'Tikkun (Mending)', Buddhist:'Beginning Again', Hindu:'Punar Nirman', 'African Traditional':'Raising the House', Indigenous:'New Fire', Mystic:'Reformation', 'New Age / Metaphysical':'Recalibration', Universal:'Rebuilding'}
+  'Wilderness':{Christian:'The Wilderness', Islamic:'Sabr (Patient Endurance)', Jewish:'Bamidbar (In the Desert)', Buddhist:'The Charnel Ground', Hindu:'Vanaprastha Passage', 'Afro-Spirituality':'The Crossroads', Indigenous:'The Vision Quest', Mystic:'The Desert of the Soul', 'New Age / Metaphysical':'The Void', Universal:'The Wilderness'},
+  'Dark Night':{Christian:'Dark Night of the Soul', Islamic:'Qabd (Contraction)', Jewish:'Hester Panim', Buddhist:'The Great Doubt', Hindu:'Tamas Passage', 'Afro-Spirituality':'The Deep Water', Indigenous:'The Long Winter', Mystic:'Dark Night of the Soul', 'New Age / Metaphysical':'Shadow Integration', Universal:'The Dark Night'},
+  'Awakening':{Christian:'Revival', Islamic:'Yaqzah (Awakening)', Jewish:'Hitorerut', Buddhist:'Bodhi Stirring', Hindu:'Kundalini Rising', 'Afro-Spirituality':'The Calling', Indigenous:'First Light', Mystic:'Illumination', 'New Age / Metaphysical':'Ascension', Universal:'Awakening'},
+  'Harvest':{Christian:'The Harvest', Islamic:'Barakah (Abundance)', Jewish:'Sukkot Season', Buddhist:'Ripened Karma', Hindu:'Phala (Fruition)', 'Afro-Spirituality':'First Fruits', Indigenous:'The Gathering', Mystic:'Union', 'New Age / Metaphysical':'Manifestation', Universal:'Harvest'},
+  'Waiting':{Christian:'The Waiting Room', Islamic:'Tawakkul (Trusting Reliance)', Jewish:'Kavanah of Patience', Buddhist:'Sitting with What Is', Hindu:'Titiksha (Forbearance)', 'Afro-Spirituality':'Listening Time', Indigenous:'The Still Season', Mystic:'Holy Indifference', 'New Age / Metaphysical':'Divine Timing', Universal:'Waiting'},
+  'Rebuilding':{Christian:'Restoration', Islamic:'Islah (Repair)', Jewish:'Tikkun (Mending)', Buddhist:'Beginning Again', Hindu:'Punar Nirman', 'Afro-Spirituality':'Raising the House', Indigenous:'New Fire', Mystic:'Reformation', 'New Age / Metaphysical':'Recalibration', Universal:'Rebuilding'}
 };
 const DIVINE_NAMES = ['God','The Divine','Source','Spirit','The Universe','The Most High','Creator'];
 const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','Sufi Poetry','A blend of many'];
@@ -515,7 +521,7 @@ const TEXTS = {
   Jewish:[['Be still before the Lord and wait patiently.','Psalm 37:7'],['The soul of man is the lamp of God.','Proverbs 20:27'],['In quietness and trust shall be your strength.','Isaiah 30:15']],
   Buddhist:[['Peace comes from within. Do not seek it without.','Attributed to the Buddha'],['You yourself, as much as anybody, deserve your love and affection.','Buddhist teaching'],['The mind is everything. What you think, you become.','Dhammapada (paraphrase)']],
   Hindu:[['The soul is neither born, and nor does it die.','Bhagavad Gita 2:20'],['Yoga is the journey of the self, through the self, to the self.','Bhagavad Gita'],['When meditation is mastered, the mind is unwavering like a flame in a windless place.','Bhagavad Gita 6:19']],
-  'African Traditional':[['However far the stream flows, it never forgets its source.','Yoruba proverb'],['The ancestors speak in the quiet between heartbeats.','Traditional wisdom'],['Wisdom is like a baobab tree; no one individual can embrace it.','Akan proverb']],
+  'Afro-Spirituality':[['However far the stream flows, it never forgets its source.','Yoruba proverb'],['The ancestors speak in the quiet between heartbeats.','Traditional wisdom'],['Wisdom is like a baobab tree; no one individual can embrace it.','Akan proverb']],
   Indigenous:[['Listen to the wind, it talks. Listen to the silence, it speaks.','Native wisdom'],['We do not inherit the earth from our ancestors; we borrow it from our children.','Indigenous teaching'],['The heart knows the way. Walk in beauty.','Diné blessing (paraphrase)']],
   Mystic:[['The wound is the place where the Light enters you.','Rumi'],['Silence is the language of God; all else is poor translation.','Rumi'],['What you seek is seeking you.','Rumi']],
   'New Age / Metaphysical':[['You are not a drop in the ocean. You are the entire ocean in a drop.','Rumi'],['Energy flows where attention goes.','Metaphysical principle'],['As above, so below; as within, so without.','Hermetic axiom']],
@@ -533,8 +539,11 @@ function dailyText(){
   const day = Math.floor(Date.now()/86400000);
   const book = userBook();
   if(BOOK_TEXTS[book]) return BOOK_TEXTS[book][day % BOOK_TEXTS[book].length];
-  const list = TEXTS[S.user.lens] || TEXTS.Universal;
-  return list[day % list.length];
+  const lenses = (S.user.lenses && S.user.lenses.length) ? S.user.lenses : [S.user.lens];
+  let pool = [];
+  lenses.forEach(l=>{ if(TEXTS[l]) pool = pool.concat(TEXTS[l]); });
+  if(!pool.length) pool = TEXTS.Universal;
+  return pool[day % pool.length];
 }
 
 /* ---------- helpers ---------- */
@@ -780,7 +789,7 @@ const OB = {
   lenses:[], customLens:'', explorer:false, soulName:'', divineName:'The Divine', divineCustom:'',
   holyBook:'auto', holyBookCustom:'',
   comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
-  gifts:[], relational:'', season:'', processing:[]
+  gifts:[], relational:[], season:'', processing:[]
 };
 const COMFORT_CATS = [
   ['scripture','Scripture and Sacred Text','menu_book'],
@@ -821,9 +830,10 @@ function viewOnboarding(){
   if(obStep===1){
     return obShell(`
       <h1 class="screen-title" style="margin-bottom:6px">Your traditions</h1>
-      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Which traditions feel like home? Choose as many as fit. The first one you pick becomes the main language Selah uses with you.</p>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Spirituality is rarely just one thing. Tap every tradition you draw from — plenty of people blend, like Christianity and Afro-Spirituality, or Jewish practice alongside Jesus. The first one you tap becomes the main language Selah leads with.</p>
       <div id="ob-lens">${LENSES.map(l=>{const i=u.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" data-v="${l}"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${l}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
-      <input id="ob-lens-custom" placeholder="Something else? Say it in your own words…" value="${esc(u.customLens)}" style="margin-top:6px;margin-bottom:14px">
+      ${u.lenses.length?`<div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:4px;margin-bottom:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${u.lenses.map(esc).join(' + ')}</p></div>`:''}
+      <input id="ob-lens-custom" placeholder="Something else? Say it in your own words… (like Messianic Jewish)" value="${esc(u.customLens)}" style="margin-top:6px;margin-bottom:14px">
       <label class="field-label" style="margin-top:6px">Which sacred text do you read? <span style="color:var(--ink-30);text-transform:none;letter-spacing:0">(optional)</span></label>
       <select id="ob-book" style="margin-bottom:8px">
         <option value="auto" ${u.holyBook==='auto'?'selected':''}>Match my tradition</option>
@@ -855,13 +865,13 @@ function viewOnboarding(){
   if(obStep===4){
     return obShell(`
       <h1 class="screen-title" style="margin-bottom:6px">Who walks with you?</h1>
-      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">This shapes what Selah suggests.</p>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Choose any that fit — most people are a mix.</p>
       <div id="ob-rel">
-        <button class="opt-card ${u.relational==='Solitary'?'on':''}" data-v="Solitary"><span class="material-symbols-outlined">person</span>Mostly on my own<small>My practice is mine alone</small></button>
-        <button class="opt-card ${u.relational==='Small Circle'?'on':''}" data-v="Small Circle"><span class="material-symbols-outlined">group</span>A few trusted people<small>A small circle walks with me</small></button>
-        <button class="opt-card ${u.relational==='Community'?'on':''}" data-v="Community"><span class="material-symbols-outlined">groups</span>A community<small>I draw strength from the group</small></button>
+        <button class="opt-card ${u.relational.includes('Solitary')?'on':''}" data-v="Solitary"><span class="material-symbols-outlined">person</span>Time on my own<small>Some of my practice is mine alone</small></button>
+        <button class="opt-card ${u.relational.includes('Small Circle')?'on':''}" data-v="Small Circle"><span class="material-symbols-outlined">group</span>A few trusted people<small>A small circle walks with me</small></button>
+        <button class="opt-card ${u.relational.includes('Community')?'on':''}" data-v="Community"><span class="material-symbols-outlined">groups</span>A community<small>I draw strength from the group</small></button>
       </div>
-    `, !!u.relational);
+    `, u.relational.length>0);
   }
   if(obStep===5){
     const lens = obPrimaryLens();
@@ -892,7 +902,6 @@ function wireOnboarding(){
   const pickOne = (id, set)=>{ const el=document.getElementById(id); if(!el) return;
     el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{ set(b.dataset.v); render(); }); };
   pickOne('ob-divine', v=>{ OB.divineName=v; OB.divineCustom=''; });
-  pickOne('ob-rel', v=>OB.relational=v);
   pickOne('ob-season', v=>OB.season=v);
   const pickMany = (id, arr)=>{ const el=document.getElementById(id); if(!el) return;
     el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{
@@ -901,6 +910,7 @@ function wireOnboarding(){
       render();
     }); };
   pickMany('ob-lens', OB.lenses);
+  pickMany('ob-rel', OB.relational);
   pickMany('ob-gifts', OB.gifts);
   pickMany('ob-proc', OB.processing);
   const exp = document.getElementById('ob-explorer');
@@ -921,7 +931,7 @@ function wireOnboarding(){
       customLens: OB.customLens.trim(),
       holyBook: OB.holyBook, holyBookCustom: OB.holyBookCustom.trim(),
       explorer: OB.explorer, comfort: OB.comfort, gifts: OB.gifts.slice(),
-      relational: OB.relational, season: OB.season, processing: OB.processing.slice()
+      relational: OB.relational.slice(), season: OB.season, processing: OB.processing.slice()
     };
     S.onboarded = true; markStreak(); save();
     route='home'; render();
@@ -1730,7 +1740,7 @@ function viewSoul(){
       <p style="font-size:12px;color:var(--ink-40);margin-top:4px">${esc(S.auth.contact)}</p>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
         <span class="chip purple">✦ Selah Pro · testing</span>
-        <span class="chip dim">${esc((u.lenses&&u.lenses.length>1)?u.lens+' +'+(u.lenses.length-1):u.lens)}${u.customLens?' · '+esc(u.customLens):''}</span>
+        <span class="chip dim">${esc((u.lenses&&u.lenses.length)?(u.lenses.length<=2?u.lenses.join(' + '):u.lenses.slice(0,2).join(' + ')+' +'+(u.lenses.length-2)):u.lens)}${u.customLens?' · '+esc(u.customLens):''}</span>
         ${u.season?`<span class="chip dim">${esc(seasonLabel(u.season))}</span>`:''}
       </div>
     </section>
@@ -1770,9 +1780,23 @@ function soulRow(icon,title,sub,fn){
   </button>`;
 }
 function editLens(){
-  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Primary Language</h2>
-    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">This is the tradition whose language Selah leads with. Your other selected traditions stay part of your profile.</p>
-    ${LENSES.map(l=>`<button class="opt-card ${S.user.lens===l?'on':''}" onclick="S.user.lens='${l}';save();closeModal();render();toast('Selah now speaks in ${l} language.')"><span class="material-symbols-outlined">auto_awesome</span>${l}</button>`).join('')}`);
+  if(!Array.isArray(S.user.lenses) || !S.user.lenses.length) S.user.lenses = [S.user.lens || 'Universal'];
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Traditions</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Tap every tradition you draw from — blends are welcome here. The first one is the language Selah leads with. Tap a selected one to remove it.</p>
+    ${LENSES.map(l=>{const i=S.user.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleLens('${l}')"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${l}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
+    <label class="field-label" style="margin-top:10px">In your own words (optional)</label>
+    <input id="lens-custom-edit" placeholder="Like Messianic Jewish, Ifa and Christ…" value="${esc(S.user.customLens||'')}">
+    <div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${S.user.lenses.map(esc).join(' + ')}</p></div>
+    <button class="grad-btn" style="margin-top:14px" onclick="S.user.customLens=document.getElementById('lens-custom-edit').value.trim();save();closeModal();render();toast('Selah now speaks your blend, leading with '+S.user.lens+'.')">Done</button>`);
+}
+function toggleLens(l){
+  const cust = document.getElementById('lens-custom-edit');
+  if(cust) S.user.customLens = cust.value.trim();
+  const i = S.user.lenses.indexOf(l);
+  if(i>-1){ if(S.user.lenses.length>1) S.user.lenses.splice(i,1); }
+  else S.user.lenses.push(l);
+  S.user.lens = S.user.lenses[0];
+  save(); editLens();
 }
 function editDivine(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Name for the Sacred</h2>
