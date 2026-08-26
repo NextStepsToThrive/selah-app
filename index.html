@@ -370,9 +370,9 @@ const LENS_LABELS = {
   'Taoist':'Taoist / East Asian'
 };
 function lensLabel(l){ return LENS_LABELS[l] || l; }
-const PLAIN_GIFTS = {'Clairvoyance':'Seeing','Clairaudience':'Hearing','Clairsentience':'Gut Sense','Clairempathy':'Feeling Others','Claircognizance':'Just Knowing','Clairgustance':'Taste Sense','Clairsalience':'Scent Sense','Clairtangency':'Touch Sense','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dreamed It Before'};
+const PLAIN_GIFTS = {'Clairvoyance':'Seeing','Clairaudience':'Hearing','Clairsentience':'Gut Sense','Clairempathy':'Feeling Others','Claircognizance':'Just Knowing','Clairgustance':'Taste Sense','Clairsalience':'Scent Sense','Clairtangency':'Touch Sense','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dreamed It Before','Bibliomancy':'Sacred Page Guidance'};
 const GIFT_LENS = {
-  Christian:{'Clairvoyance':'Visions','Clairaudience':'Hearing His Voice','Clairsentience':'Discernment','Clairempathy':'Burden Bearing','Claircognizance':'Word of Knowledge','Clairgustance':'Taste Impressions','Clairsalience':'Scent Impressions','Clairtangency':'Touch Impressions','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dream Echo'},
+  Christian:{'Clairvoyance':'Visions','Clairaudience':'Hearing His Voice','Clairsentience':'Discernment','Clairempathy':'Burden Bearing','Claircognizance':'Word of Knowledge','Clairgustance':'Taste Impressions','Clairsalience':'Scent Impressions','Clairtangency':'Touch Impressions','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dream Echo','Bibliomancy':'Opening the Word'},
   Islamic:{'Clairvoyance':'Kashf (Unveiling)','Clairaudience':'Inner Hearing','Clairsentience':'Firasa (Insight)','Claircognizance':'Given Knowledge','Déjà Rêvé':'True Dream Echo'},
   Jewish:{'Clairvoyance':'Chazon (Vision)','Clairaudience':'Bat Kol','Clairsentience':'Binah (Understanding)','Claircognizance':"Da'at (Knowing)"},
   Buddhist:{'Clairvoyance':'Clear Seeing','Clairaudience':'Deep Listening','Clairsentience':'Felt Awareness','Claircognizance':'Direct Knowing'},
@@ -401,6 +401,34 @@ const DEITY_PRONOUNS = [
   {k:'She', label:'She / Her', sub:''},
   {k:'They', label:'They / Them', sub:''}
 ];
+/* ---------- drag-to-reorder (optional preferred order) ---------- */
+function orderRow(id, arr, labelFn){
+  if(!Array.isArray(arr) || arr.length < 2) return '';
+  return `<div style="margin-top:10px">
+    <span class="eyebrow" style="font-size:8px;color:var(--ink-40)">Prefer an order? Drag to rearrange · optional</span>
+    <div id="${id}" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+      ${arr.map((v,i)=>`<span class="chip order-chip" draggable="true" data-i="${i}" style="cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none"><span class="material-symbols-outlined" style="font-size:12px">drag_indicator</span>${esc(labelFn ? labelFn(v) : v)}</span>`).join('')}
+    </div></div>`;
+}
+function wireOrderRow(id, arr, after){
+  const row = document.getElementById(id); if(!row) return;
+  const move = (from, to)=>{ if(from===to || from==null || to==null) return; const [m]=arr.splice(from,1); arr.splice(to,0,m); after(); };
+  row.querySelectorAll('.order-chip').forEach(ch=>{
+    ch.addEventListener('dragstart', e=>{ row._drag = +ch.dataset.i; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',''); }catch(_e){} });
+    ch.addEventListener('dragover', e=>e.preventDefault());
+    ch.addEventListener('drop', e=>{ e.preventDefault(); move(row._drag, +ch.dataset.i); row._drag = null; });
+    ch.addEventListener('touchstart', ()=>{ row._drag = +ch.dataset.i; ch.style.opacity = .55; }, {passive:true});
+    ch.addEventListener('touchmove', e=>{ e.preventDefault(); }, {passive:false});
+    ch.addEventListener('touchend', e=>{
+      ch.style.opacity = '';
+      const t = e.changedTouches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const target = el && el.closest('.order-chip');
+      if(target && target.parentElement === row) move(row._drag, +target.dataset.i);
+      row._drag = null;
+    });
+  });
+}
 function divineList(){
   const a = (Array.isArray(S.user.divineNames) && S.user.divineNames.length) ? S.user.divineNames : [S.user.divineName || 'The Divine'];
   return a;
@@ -465,7 +493,8 @@ const CLAIRS = [
   {k:'Clairsentience', icon:'touch_app'},{k:'Clairempathy', icon:'favorite'},
   {k:'Claircognizance', icon:'lightbulb'},{k:'Clairgustance', icon:'restaurant'},
   {k:'Clairsalience', icon:'air'},{k:'Clairtangency', icon:'pan_tool'},
-  {k:'Déjà Vu', icon:'history'},{k:'Déjà Rêvé', icon:'bedtime'}
+  {k:'Déjà Vu', icon:'history'},{k:'Déjà Rêvé', icon:'bedtime'},
+  {k:'Bibliomancy', icon:'auto_stories'}
 ];
 const CLAIR_INFO = {
   'Clairvoyance':{desc:'Seeing images, visions, or inner pictures that carry meaning.', syn:'clear seeing, visions, the seer gift, second sight'},
@@ -477,7 +506,8 @@ const CLAIR_INFO = {
   'Clairsalience':{desc:'Smelling a scent with no physical source, like perfume or smoke.', syn:'clear smelling, clairalience'},
   'Clairtangency':{desc:'Picking up impressions through touch, from objects or places.', syn:'clear touching, psychometry'},
   'Déjà Vu':{desc:'The strong sense that this exact moment has happened before.', syn:'already seen'},
-  'Déjà Rêvé':{desc:'Recognizing a waking moment from an earlier dream.', syn:'already dreamed, dream memory'}
+  'Déjà Rêvé':{desc:'Recognizing a waking moment from an earlier dream.', syn:'already dreamed, dream memory'},
+  'Bibliomancy':{desc:'Opening a sacred book and landing on the very passage your moment needed.', syn:'libromancy, opening the Word, sacred page guidance'}
 };
 const EMOTIONS = [
   {k:'Sadness', icon:'heart_broken'},{k:'Anxiety', icon:'warning'},
@@ -650,6 +680,7 @@ const ES = {
   'Choose every name you use — many people use several, and Selah will use them all.':'Elige cada nombre que uses — muchas personas usan varios, y Selah los usará todos.',
   'Choose all that fit — some people mix He and They, or sometimes just use the name. Selah follows your lead.':'Elige todos los que encajen — algunas personas mezclan Él y Elle, o a veces solo usan el nombre. Selah sigue tu ejemplo.',
   'Add your own (optional)':'Añade el tuyo (opcional)','Write it here…':'Escríbelo aquí…',
+  'Prefer an order? Drag to rearrange · optional':'¿Prefieres un orden? Arrastra para reorganizar · opcional',
   'Done':'Listo'
 };
 const ES_RX = [
@@ -973,10 +1004,12 @@ function viewOnboarding(){
       <label class="field-label">What do you call the sacred?</label>
       <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose every name you use — many people use several, and Selah will use them all.</p>
       <div id="ob-divine">${DIVINE_NAMES.map(d=>`<button class="opt-card ${u.divineNames.includes(d)?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span><span style="flex:1">${d}</span></button>`).join('')}</div>
+      ${orderRow('ord-divine', u.divineNames)}
       <input id="ob-divine-custom" placeholder="Or write your own…" value="${esc(u.divineCustom)}" style="margin-top:6px">
       <label class="field-label" style="margin-top:20px">How do you refer to ${esc(u.divineNames.length===1 ? u.divineNames[0] : (u.divineNames.length===0 && u.divineCustom.trim() ? u.divineCustom.trim() : 'the sacred'))}?</label>
       <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose all that fit — some people mix He and They, or sometimes just use the name. Selah follows your lead.</p>
       <div id="ob-pron">${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${u.divinePronouns.includes(pr.k)?'on':''}" data-v="${pr.k}"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}</div>
+      ${orderRow('ord-pron', u.divinePronouns, k=>(DEITY_PRONOUNS.find(x=>x.k===k)||{label:k}).label)}
     `, !!u.soulName.trim());
   }
   if(obStep===1){
@@ -984,7 +1017,7 @@ function viewOnboarding(){
       <h1 class="screen-title" style="margin-bottom:6px">Your traditions</h1>
       <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Spirituality is rarely just one thing. Tap every tradition you draw from — plenty of people blend, like Christianity and Afro-Spirituality, or Jewish practice alongside Jesus. The first one you tap becomes the main language Selah leads with.</p>
       <div id="ob-lens">${LENSES.map(l=>{const i=u.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" data-v="${l}"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${lensLabel(l)}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
-      ${u.lenses.length?`<div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:4px;margin-bottom:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${u.lenses.map(x=>esc(lensLabel(x))).join(' + ')}</p></div>`:''}
+      ${u.lenses.length?`<div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:4px;margin-bottom:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${u.lenses.map(x=>esc(lensLabel(x))).join(' + ')}</p>${orderRow('ord-lens', u.lenses, lensLabel)}</div>`:''}
       <input id="ob-lens-custom" placeholder="Something else? Say it in your own words… (like Messianic Jewish)" value="${esc(u.customLens)}" style="margin-top:6px;margin-bottom:14px">
       <label class="field-label" style="margin-top:6px">Which sacred text do you read? <span style="color:var(--ink-30);text-transform:none;letter-spacing:0">(optional)</span></label>
       <select id="ob-book" style="margin-bottom:8px">
@@ -1063,6 +1096,9 @@ function wireOnboarding(){
   pickMany('ob-divine', OB.divineNames);
   pickMany('ob-pron', OB.divinePronouns);
   pickMany('ob-lens', OB.lenses);
+  wireOrderRow('ord-divine', OB.divineNames, ()=>render());
+  wireOrderRow('ord-pron', OB.divinePronouns, ()=>render());
+  wireOrderRow('ord-lens', OB.lenses, ()=>render());
   pickMany('ob-rel', OB.relational);
   pickMany('ob-gifts', OB.gifts);
   pickMany('ob-proc', OB.processing);
@@ -2007,8 +2043,9 @@ function editLens(){
     ${LENSES.map(l=>{const i=S.user.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleLens('${l}')"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${lensLabel(l)}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
     <label class="field-label" style="margin-top:10px">In your own words (optional)</label>
     <input id="lens-custom-edit" placeholder="Like Messianic Jewish, Ifa and Christ…" value="${esc(S.user.customLens||'')}">
-    <div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${S.user.lenses.map(x=>esc(lensLabel(x))).join(' + ')}</p></div>
+    <div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${S.user.lenses.map(x=>esc(lensLabel(x))).join(' + ')}</p>${orderRow('ord-lens-m', S.user.lenses, lensLabel)}</div>
     <button class="grad-btn" style="margin-top:14px" onclick="S.user.customLens=document.getElementById('lens-custom-edit').value.trim();save();closeModal();render();toast('Selah now speaks your blend, leading with '+lensLabel(S.user.lens)+'.')">Done</button>`);
+  wireOrderRow('ord-lens-m', S.user.lenses, ()=>{ S.user.lens = S.user.lenses[0]; save(); editLens(); });
 }
 function toggleLens(l){
   const cust = document.getElementById('lens-custom-edit');
@@ -2025,9 +2062,11 @@ function editDivine(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Names for the Sacred</h2>
     <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose every name you use — Selah will use them all. Tap a selected one to remove it.</p>
     ${DIVINE_NAMES.concat(extras).map(d=>`<button class="opt-card ${list.includes(d)?'on':''}" onclick="toggleDivineName(${JSON.stringify(d).replace(/"/g,'&quot;')})"><span class="material-symbols-outlined">flare</span><span style="flex:1">${esc(d)}</span></button>`).join('')}
+    ${orderRow('ord-divine-m', list)}
     <label class="field-label" style="margin-top:10px">Add your own (optional)</label>
     <input id="divine-custom-edit" placeholder="Write it here…">
     <button class="grad-btn" style="margin-top:14px" onclick="addCustomDivine()">Done</button>`);
+  wireOrderRow('ord-divine-m', S.user.divineNames, ()=>{ syncDivine(); save(); editDivine(); });
 }
 function toggleDivineName(d){
   if(!Array.isArray(S.user.divineNames) || !S.user.divineNames.length) S.user.divineNames = [S.user.divineName || 'The Divine'];
@@ -2047,7 +2086,9 @@ function editPronoun(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">How You Refer to the Sacred</h2>
     <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose all that fit — some people mix He and They, or sometimes just use the name itself. Selah follows your lead everywhere, including how your gifts are named. Tap a selected one to remove it.</p>
     ${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${list.includes(pr.k)?'on':''}" onclick="toggleDivinePronoun('${pr.k}')"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}
+    ${orderRow('ord-pron-m', list, k=>(DEITY_PRONOUNS.find(x=>x.k===k)||{label:k}).label)}
     <button class="grad-btn" style="margin-top:14px" onclick="closeModal();render()">Done</button>`);
+  wireOrderRow('ord-pron-m', S.user.divinePronouns, ()=>{ syncDivine(); save(); editPronoun(); });
 }
 function toggleDivinePronoun(k){
   if(!Array.isArray(S.user.divinePronouns) || !S.user.divinePronouns.length) S.user.divinePronouns = [S.user.divinePronoun || 'none'];
@@ -2256,12 +2297,18 @@ async function bootApp(){
 }
 
 /* ================= BOOT ================= */
-try{
-  if(document.fonts && document.fonts.load){
-    document.fonts.load('24px "Material Symbols Outlined"').then(()=>document.body.classList.add('icons-ready'));
-  }
-}catch(e){}
-setTimeout(()=>document.body.classList.add('icons-ready'), 2500);
+/* Icons are ligature text under the hood ("visibility", "hearing"...). If the icon
+   font has not rendered yet, showing them would print those raw words — so icons
+   stay hidden until the font is confirmed, and stay hidden (never gibberish) if
+   the font cannot load at all. */
+(function(){
+  const ready = ()=>document.body.classList.add('icons-ready');
+  const hasFont = ()=>{ try{ return document.fonts.check('24px "Material Symbols Outlined"'); }catch(e){ return true; } };
+  if(!(document.fonts && document.fonts.load)){ ready(); return; }
+  try{ document.fonts.load('24px "Material Symbols Outlined"').then(()=>{ if(hasFont()) ready(); }); }catch(e){}
+  let tries = 0;
+  const t = setInterval(()=>{ tries++; if(hasFont()){ ready(); clearInterval(t); } else if(tries > 24){ clearInterval(t); } }, 500);
+})();
 bootApp();
 </script>
 
