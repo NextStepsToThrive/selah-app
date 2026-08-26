@@ -358,7 +358,14 @@ if(!Array.isArray(S.user.relational)) S.user.relational = [];
 save();
 
 /* ---------- lens translation maps ---------- */
-const LENSES = ['Christian','Islamic','Jewish','Buddhist','Hindu','Afro-Spirituality','Indigenous','Mystic','New Age / Metaphysical','Universal'];
+const LENSES = ['Christian','Islamic','Jewish','Buddhist','Hindu','Afro-Spirituality','Latino-Caribbean','Indigenous','Sikh','Taoist','Pagan','Mystic','New Age / Metaphysical','Universal'];
+const LENS_LABELS = {
+  'Afro-Spirituality':'African Traditional / Afro-Spirituality',
+  'Latino-Caribbean':'Latino / Caribbean Traditions',
+  'Pagan':'Pagan / Earth-Based',
+  'Taoist':'Taoist / East Asian'
+};
+function lensLabel(l){ return LENS_LABELS[l] || l; }
 const PLAIN_GIFTS = {'Clairvoyance':'Seeing','Clairaudience':'Hearing','Clairsentience':'Gut Sense','Clairempathy':'Feeling Others','Claircognizance':'Just Knowing','Clairgustance':'Taste Sense','Clairsalience':'Scent Sense','Clairtangency':'Touch Sense','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dreamed It Before'};
 const GIFT_LENS = {
   Christian:{'Clairvoyance':'Visions','Clairaudience':'Hearing His Voice','Clairsentience':'Discernment','Clairempathy':'Burden Bearing','Claircognizance':'Word of Knowledge','Clairgustance':'Taste Impressions','Clairsalience':'Scent Impressions','Clairtangency':'Touch Impressions','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dream Echo'},
@@ -368,9 +375,12 @@ const GIFT_LENS = {
   Hindu:{'Clairvoyance':'Divya Drishti','Clairaudience':'Divya Shrotra','Clairsentience':'Subtle Feeling','Claircognizance':'Pratibha'},
   'Afro-Spirituality':{'Clairvoyance':'Second Sight','Clairaudience':'Ancestral Hearing','Clairsentience':'Body Knowing','Claircognizance':'Deep Knowing'},
   Indigenous:{'Clairvoyance':'Vision Keeping','Clairaudience':'Spirit Listening','Clairsentience':'Earth Feeling','Claircognizance':'Original Knowing'},
-  Mystic:{}, 'New Age / Metaphysical':{}, Universal:{}
+  'Latino-Caribbean':{'Clairvoyance':'La Vista (The Sight)','Clairaudience':'Spirit Hearing','Clairsentience':'Corazonada (Gut Knowing)','Claircognizance':'Deep Knowing'},
+  Sikh:{'Clairvoyance':'Inner Vision','Clairaudience':'Hearing the Shabad','Clairsentience':'Heart Sense','Claircognizance':'Given Wisdom'},
+  Taoist:{'Clairvoyance':'Clear Seeing','Clairaudience':'Deep Listening','Clairsentience':'Felt Flow','Claircognizance':'Effortless Knowing'},
+  Mystic:{}, 'New Age / Metaphysical':{}, Pagan:{}, Universal:{}
 };
-const METAPHYSICAL_LENSES = ['New Age / Metaphysical','Mystic'];
+const METAPHYSICAL_LENSES = ['New Age / Metaphysical','Mystic','Pagan'];
 const SEASONS = ['Wilderness','Waiting','Awakening','Harvest','Rebuilding','Dark Night'];
 const SEASONS_MAP = {
   'Wilderness':{Christian:'The Wilderness', Islamic:'Sabr (Patient Endurance)', Jewish:'Bamidbar (In the Desert)', Buddhist:'The Charnel Ground', Hindu:'Vanaprastha Passage', 'Afro-Spirituality':'The Crossroads', Indigenous:'The Vision Quest', Mystic:'The Desert of the Soul', 'New Age / Metaphysical':'The Void', Universal:'The Wilderness'},
@@ -381,8 +391,8 @@ const SEASONS_MAP = {
   'Rebuilding':{Christian:'Restoration', Islamic:'Islah (Repair)', Jewish:'Tikkun (Mending)', Buddhist:'Beginning Again', Hindu:'Punar Nirman', 'Afro-Spirituality':'Raising the House', Indigenous:'New Fire', Mystic:'Reformation', 'New Age / Metaphysical':'Recalibration', Universal:'Rebuilding'}
 };
 const DIVINE_NAMES = ['God','The Divine','Source','Spirit','The Universe','The Most High','Creator'];
-const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','Sufi Poetry','A blend of many'];
-const LENS_BOOK = {Christian:'The Bible', Islamic:'The Qur\u2019an', Jewish:'The Tanakh', Hindu:'The Bhagavad Gita', Buddhist:'The Dhammapada', Mystic:'Sufi Poetry'};
+const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','The Guru Granth Sahib','The Tao Te Ching','Sufi Poetry','A blend of many'];
+const LENS_BOOK = {Christian:'The Bible', Islamic:'The Qur\u2019an', Jewish:'The Tanakh', Hindu:'The Bhagavad Gita', Buddhist:'The Dhammapada', Mystic:'Sufi Poetry', Sikh:'The Guru Granth Sahib', Taoist:'The Tao Te Ching', 'Latino-Caribbean':'The Bible'};
 function userBook(){
   if(S.user.holyBookCustom) return S.user.holyBookCustom;
   if(S.user.holyBook && S.user.holyBook!=='auto') return S.user.holyBook;
@@ -411,7 +421,7 @@ const VOCAB = {
 };
 function T(key){
   const lens = S.user.lens;
-  const v = (lens==='Christian'||lens==='Islamic'||lens==='Jewish') ? VOCAB.abrahamic
+  const v = (lens==='Christian'||lens==='Islamic'||lens==='Jewish'||lens==='Latino-Caribbean'||lens==='Sikh') ? VOCAB.abrahamic
     : METAPHYSICAL_LENSES.includes(lens) ? VOCAB.metaphysical : VOCAB.universal;
   return v[key] || VOCAB.universal[key] || key;
 }
@@ -525,6 +535,10 @@ const TEXTS = {
   Indigenous:[['Listen to the wind, it talks. Listen to the silence, it speaks.','Native wisdom'],['We do not inherit the earth from our ancestors; we borrow it from our children.','Indigenous teaching'],['The heart knows the way. Walk in beauty.','Diné blessing (paraphrase)']],
   Mystic:[['The wound is the place where the Light enters you.','Rumi'],['Silence is the language of God; all else is poor translation.','Rumi'],['What you seek is seeking you.','Rumi']],
   'New Age / Metaphysical':[['You are not a drop in the ocean. You are the entire ocean in a drop.','Rumi'],['Energy flows where attention goes.','Metaphysical principle'],['As above, so below; as within, so without.','Hermetic axiom']],
+  'Latino-Caribbean':[['La fe mueve monta\u00f1as. Faith moves mountains.','Folk wisdom'],['Where a candle is lit, the ancestors draw near.','Caribbean tradition'],['God squeezes, but He does not choke. Dios aprieta pero no ahorca.','Latino proverb']],
+  Sikh:[['Truth is high, but higher still is truthful living.','Guru Nanak'],['Even kings and emperors amass wealth like mountains; the love of the Divine outweighs it all.','Guru Granth Sahib'],['Let compassion be your mosque, and honest living your prayer.','Guru Nanak (paraphrase)']],
+  Taoist:[['Nature does not hurry, yet everything is accomplished.','Lao Tzu'],['The softest thing in the world overcomes the hardest.','Tao Te Ching 43'],['To the mind that is still, the whole universe surrenders.','Attributed to Lao Tzu']],
+  Pagan:[['The earth remembers what we forget. Walk gently.','Earth wisdom'],['As the wheel turns, so do we. Every season has its medicine.','Pagan teaching'],['You are not on the earth; you are of it.','Earth-based wisdom']],
   Universal:[['Be still. Pause, reflect, discern.','Selah'],['The quieter you become, the more you are able to hear.','Contemplative wisdom'],['This too is a threshold. Cross it slowly.','Selah']]
 };
 const BOOK_TEXTS = {
@@ -533,7 +547,9 @@ const BOOK_TEXTS = {
   'The Tanakh':[['Be still before the Lord and wait patiently.','Psalm 37:7'],['The soul of man is the lamp of God.','Proverbs 20:27'],['Act justly, love mercy, walk humbly with your God.','Micah 6:8']],
   'The Bhagavad Gita':[['The soul is neither born, and nor does it die.','Bhagavad Gita 2:20'],['When meditation is mastered, the mind is unwavering like a flame in a windless place.','Bhagavad Gita 6:19'],['Yoga is the journey of the self, through the self, to the self.','Bhagavad Gita']],
   'The Dhammapada':[['The mind is everything. What you think, you become.','Dhammapada (paraphrase)'],['Peace comes from within. Do not seek it without.','Attributed to the Buddha'],['Better than a thousand hollow words is one word that brings peace.','Dhammapada 100']],
-  'Sufi Poetry':[['The wound is the place where the Light enters you.','Rumi'],['What you seek is seeking you.','Rumi'],['Silence is the language of God; all else is poor translation.','Rumi']]
+  'Sufi Poetry':[['The wound is the place where the Light enters you.','Rumi'],['What you seek is seeking you.','Rumi'],['Silence is the language of God; all else is poor translation.','Rumi']],
+  'The Guru Granth Sahib':[['Truth is high, but higher still is truthful living.','Guru Nanak'],['As fragrance abides in the flower, the Divine dwells within.','Guru Granth Sahib (paraphrase)'],['Let compassion be your mosque, and honest living your prayer.','Guru Nanak (paraphrase)']],
+  'The Tao Te Ching':[['Nature does not hurry, yet everything is accomplished.','Lao Tzu'],['The softest thing in the world overcomes the hardest.','Tao Te Ching 43'],['A journey of a thousand miles begins beneath your feet.','Tao Te Ching 64']]
 };
 function dailyText(){
   const day = Math.floor(Date.now()/86400000);
@@ -831,8 +847,8 @@ function viewOnboarding(){
     return obShell(`
       <h1 class="screen-title" style="margin-bottom:6px">Your traditions</h1>
       <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Spirituality is rarely just one thing. Tap every tradition you draw from — plenty of people blend, like Christianity and Afro-Spirituality, or Jewish practice alongside Jesus. The first one you tap becomes the main language Selah leads with.</p>
-      <div id="ob-lens">${LENSES.map(l=>{const i=u.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" data-v="${l}"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${l}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
-      ${u.lenses.length?`<div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:4px;margin-bottom:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${u.lenses.map(esc).join(' + ')}</p></div>`:''}
+      <div id="ob-lens">${LENSES.map(l=>{const i=u.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" data-v="${l}"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${lensLabel(l)}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
+      ${u.lenses.length?`<div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:4px;margin-bottom:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${u.lenses.map(x=>esc(lensLabel(x))).join(' + ')}</p></div>`:''}
       <input id="ob-lens-custom" placeholder="Something else? Say it in your own words… (like Messianic Jewish)" value="${esc(u.customLens)}" style="margin-top:6px;margin-bottom:14px">
       <label class="field-label" style="margin-top:6px">Which sacred text do you read? <span style="color:var(--ink-30);text-transform:none;letter-spacing:0">(optional)</span></label>
       <select id="ob-book" style="margin-bottom:8px">
@@ -982,7 +998,7 @@ function viewHome(){
     <section class="section glass card" style="border-radius:32px">
       <div class="section-head" style="margin-bottom:18px">
         <span style="font-size:14px;font-weight:700">Your <span class="accent-p">Streak</span></span>
-        <span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700">${streakCount()} Day <span class="material-symbols-outlined accent-p" style="font-size:16px">local_fire_department</span></span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700">${(n=>n>0? n+(n===1?' Day':' Days'):'Begins Today')(streakCount())} <span class="material-symbols-outlined accent-p" style="font-size:16px">local_fire_department</span></span>
       </div>
       <div class="streak-row">${week.map(w=>`<div class="streak-day ${w.hit?'hit':''}"><span class="d">${w.label}</span><span class="n">${w.num}</span></div>`).join('')}</div>
     </section>
@@ -1019,12 +1035,12 @@ function viewHome(){
       <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;border-color:rgba(43,238,227,.3);background:var(--glass)" onclick="go('victories')">
         <span class="material-symbols-outlined accent-t" style="margin-bottom:10px">verified</span>
         <div class="eyebrow" style="color:rgba(43,238,227,.7);font-size:9px;margin-bottom:4px">${T('wall')}</div>
-        <div style="font-size:19px;font-weight:700;color:#fff">${victories} answered</div>
+        <div style="font-size:${victories>0?19:15}px;font-weight:700;color:#fff">${victories>0? victories+' Answered' : 'Your First Awaits'}</div>
       </button>
       <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;border-color:rgba(173,43,238,.3);background:var(--glass)" onclick="go('petitions')">
         <span class="material-symbols-outlined accent-p" style="margin-bottom:10px">waving_hand</span>
         <div class="eyebrow" style="color:rgba(173,43,238,.8);font-size:9px;margin-bottom:4px">${T('activeShort')}</div>
-        <div style="font-size:19px;font-weight:700;color:#fff">${active} active</div>
+        <div style="font-size:${active>0?19:15}px;font-weight:700;color:#fff">${active>0? active+' Active' : 'Start One'}</div>
       </button>
     </section>
 
@@ -1034,12 +1050,12 @@ function viewHome(){
         <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;background:var(--glass)" onclick="go('moments','dream')">
           <div style="width:40px;height:40px;border-radius:12px;background:rgba(173,43,238,.1);border:1px solid rgba(173,43,238,.25);display:flex;align-items:center;justify-content:center;margin-bottom:24px"><span class="material-symbols-outlined accent-p">bedtime</span></div>
           <div style="font-size:14px;font-weight:700;color:#fff">Dream Logs</div>
-          <div style="font-size:10px;color:var(--ink-40);margin-top:4px">${S.moments.filter(m=>m.type==='dream').length} logged</div>
+          <div style="font-size:10px;color:var(--ink-40);margin-top:4px">${(n=>n>0? n+' Logged':'Record Your First')(S.moments.filter(m=>m.type==='dream').length)}</div>
         </button>
         <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;background:var(--glass)" onclick="go('moments','waking')">
           <div style="width:40px;height:40px;border-radius:12px;background:rgba(43,238,227,.1);border:1px solid rgba(43,238,227,.25);display:flex;align-items:center;justify-content:center;margin-bottom:24px"><span class="material-symbols-outlined accent-t">eco</span></div>
           <div style="font-size:14px;font-weight:700;color:#fff">Waking Moments</div>
-          <div style="font-size:10px;color:var(--ink-40);margin-top:4px">${S.moments.filter(m=>m.type==='waking').length} noticed</div>
+          <div style="font-size:10px;color:var(--ink-40);margin-top:4px">${(n=>n>0? n+' Noticed':'Notice Your First')(S.moments.filter(m=>m.type==='waking').length)}</div>
         </button>
       </div>
     </section>
@@ -1253,7 +1269,7 @@ function viewSpace(){
     </section>`:`<p style="text-align:center;margin-bottom:22px" class="tagline">PAUSE • REFLECT • DISCERN</p>`}
 
     <section class="section glass card" style="border-radius:28px">
-      <div class="section-head" style="margin-bottom:8px"><span class="eyebrow">Your Practice</span><span style="font-size:12px;font-weight:700;color:var(--primary)">${ritualCount} logged</span></div>
+      <div class="section-head" style="margin-bottom:8px"><span class="eyebrow">Your Practice</span><span style="font-size:12px;font-weight:700;color:var(--primary)">${ritualCount>0? ritualCount+' Logged':'Log Your First'}</span></div>
       <div style="height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden"><div class="grad" style="height:100%;width:${Math.min(100,ritualCount*10)}%"></div></div>
       <button class="grad-btn" style="margin-top:16px;padding:14px" onclick="go('ritual')"><span class="material-symbols-outlined" style="font-size:18px">auto_fix_normal</span>${T('logRitual')}</button>
     </section>
@@ -1300,7 +1316,7 @@ function viewRitualLog(){
       <div class="pill-row">${RITUAL_PATHS.filter(p=>comfortable(p.cat)).map(p=>`<button class="pill ${R.type===p.k?'on':''}" onclick="R.type='${p.k}';render()">${p.k}</button>`).join('')}</div>
     </div>
     <div class="section">
-      <div class="section-head"><span class="eyebrow">What did you use?</span><span style="font-size:10px;color:var(--teal);font-weight:700">${R.tools.length} selected</span></div>
+      <div class="section-head"><span class="eyebrow">What did you use?</span><span style="font-size:10px;color:var(--teal);font-weight:700">${R.tools.length>0? R.tools.length+' Selected':'Choose Any'}</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         ${tools.map(t=>`<button class="opt-card ${R.tools.includes(t.k)?'on':''}" style="margin-bottom:0" data-tool="${t.k}"><span class="material-symbols-outlined">${t.icon}</span><span style="font-size:13px;font-weight:700">${t.k}</span></button>`).join('')}
       </div>
@@ -1469,7 +1485,7 @@ function viewPulse(){
         ${pats.map(p=>`<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px">
           <div class="sym-circle">${p.k==='11:11'?'<span style="font-size:15px;font-weight:800;letter-spacing:-.04em">11:11</span>':`<span class="material-symbols-outlined" style="font-size:26px;font-weight:300">${p.icon}</span>`}</div>
           <div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.75)">${esc(p.name)}</div>
-          <div style="font-size:8px;color:var(--ink-40);margin-top:2px">${p.n.toLocaleString()} people today</div></div>
+          <div style="font-size:8px;color:var(--ink-40);margin-top:2px">${p.n.toLocaleString()} People Today</div></div>
         </div>`).join('')}
       </div>
     </section>
@@ -1546,7 +1562,7 @@ function viewPetitions(){
         <button class="icon-mini" onclick="delPetition('${p.id}')" title="Release"><span class="material-symbols-outlined" style="font-size:16px">delete</span></button>
       </div>
       ${p.body?`<p style="font-size:13px;color:var(--ink-70);line-height:1.6;margin-bottom:12px">${esc(p.body)}</p>`:''}
-      <div style="display:flex;gap:10px;margin-bottom:14px"><span class="chip dim">${days} day${days===1?'':'s'} active</span></div>
+      <div style="display:flex;gap:10px;margin-bottom:14px"><span class="chip dim">${days} Day${days===1?'':'s'} Active</span></div>
       <button class="grad-btn" style="padding:13px;font-size:12px" onclick="markAnswered('${p.id}')">${T('markDone')}</button>
     </div>`;}).join('')}
     <button class="ghost-btn" style="padding:17px;margin-bottom:30px" onclick="openPetitionForm()"><span class="material-symbols-outlined accent-t" style="font-size:20px">add_circle</span>${T('addPetition')}</button>
@@ -1585,9 +1601,9 @@ function viewVictories(){
     <h1 class="screen-title" style="margin-bottom:4px">${T('wall')}</h1>
     <p class="tagline" style="font-size:9px;margin-bottom:18px">PAUSE • REFLECT • DISCERN</p>
     <div class="glass card" style="border-radius:20px;display:flex;justify-content:space-around;align-items:center;padding:16px;margin-bottom:22px">
-      <div style="text-align:center"><div style="font-size:19px;font-weight:700">${wins.length}</div><div class="eyebrow" style="font-size:8px">Answered</div></div>
+      <div style="text-align:center"><div style="font-size:${wins.length>0?19:12}px;font-weight:700">${wins.length>0?wins.length:'Soon'}</div><div class="eyebrow" style="font-size:8px">Answered</div></div>
       <div style="width:1px;height:30px;background:rgba(255,255,255,.1)"></div>
-      <div style="text-align:center"><div style="font-size:19px;font-weight:700;color:var(--teal)">${waiting.length}</div><div class="eyebrow" style="font-size:8px">Still Active</div></div>
+      <div style="text-align:center"><div style="font-size:${waiting.length>0?19:12}px;font-weight:700;color:var(--teal)">${waiting.length>0?waiting.length:'Add One'}</div><div class="eyebrow" style="font-size:8px">Still Active</div></div>
     </div>
     ${wins.length===0 && waiting.length===0?`<div class="glass card" style="border-radius:24px;text-align:center;padding:36px;color:var(--ink-40);font-size:14px;line-height:1.7">Nothing on the wall yet. It fills up as things come through.</div>`:''}
     <div class="masonry">
@@ -1740,7 +1756,7 @@ function viewSoul(){
       <p style="font-size:12px;color:var(--ink-40);margin-top:4px">${esc(S.auth.contact)}</p>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
         <span class="chip purple">✦ Selah Pro · testing</span>
-        <span class="chip dim">${esc((u.lenses&&u.lenses.length)?(u.lenses.length<=2?u.lenses.join(' + '):u.lenses.slice(0,2).join(' + ')+' +'+(u.lenses.length-2)):u.lens)}${u.customLens?' · '+esc(u.customLens):''}</span>
+        <span class="chip dim">${esc((u.lenses&&u.lenses.length)?(u.lenses.length<=2?u.lenses.map(lensLabel).join(' + '):u.lenses.slice(0,2).map(lensLabel).join(' + ')+' +'+(u.lenses.length-2)):lensLabel(u.lens))}${u.customLens?' · '+esc(u.customLens):''}</span>
         ${u.season?`<span class="chip dim">${esc(seasonLabel(u.season))}</span>`:''}
       </div>
     </section>
@@ -1783,11 +1799,11 @@ function editLens(){
   if(!Array.isArray(S.user.lenses) || !S.user.lenses.length) S.user.lenses = [S.user.lens || 'Universal'];
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Traditions</h2>
     <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Tap every tradition you draw from — blends are welcome here. The first one is the language Selah leads with. Tap a selected one to remove it.</p>
-    ${LENSES.map(l=>{const i=S.user.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleLens('${l}')"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${l}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
+    ${LENSES.map(l=>{const i=S.user.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleLens('${l}')"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${lensLabel(l)}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
     <label class="field-label" style="margin-top:10px">In your own words (optional)</label>
     <input id="lens-custom-edit" placeholder="Like Messianic Jewish, Ifa and Christ…" value="${esc(S.user.customLens||'')}">
-    <div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${S.user.lenses.map(esc).join(' + ')}</p></div>
-    <button class="grad-btn" style="margin-top:14px" onclick="S.user.customLens=document.getElementById('lens-custom-edit').value.trim();save();closeModal();render();toast('Selah now speaks your blend, leading with '+S.user.lens+'.')">Done</button>`);
+    <div class="glass card" style="border-radius:14px;padding:12px 16px;margin-top:10px;border-color:rgba(43,238,227,.3)"><span class="eyebrow" style="font-size:8px;color:var(--teal)">Your blend</span><p style="font-size:13px;font-weight:600;margin-top:4px">${S.user.lenses.map(x=>esc(lensLabel(x))).join(' + ')}</p></div>
+    <button class="grad-btn" style="margin-top:14px" onclick="S.user.customLens=document.getElementById('lens-custom-edit').value.trim();save();closeModal();render();toast('Selah now speaks your blend, leading with '+lensLabel(S.user.lens)+'.')">Done</button>`);
 }
 function toggleLens(l){
   const cust = document.getElementById('lens-custom-edit');
@@ -1964,7 +1980,7 @@ const BK = {
       clairs: J.clairs.map(c=>({ key:c, label:giftLabel(c) })),
       symbols: J.symbols.map(k=>({ key:k, name:SYMBOLS[k].name, meaning:SYMBOLS[k].meaning })),
       user: {
-        name: S.user.soulName, lens: S.user.lens, lenses: S.user.lenses||[S.user.lens],
+        name: S.user.soulName, lens: lensLabel(S.user.lens), lenses: (S.user.lenses||[S.user.lens]).map(lensLabel),
         custom_lens: S.user.customLens||null, divine_name: S.user.divineName,
         holy_book: userBook(),
         season: S.user.season ? seasonLabel(S.user.season) : null,
