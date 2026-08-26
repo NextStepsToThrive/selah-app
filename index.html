@@ -687,7 +687,7 @@ function viewAuth(){
       <p style="color:var(--ink-50);font-size:14px;margin-top:10px;text-align:center;line-height:1.6">We sent a 6-digit code to<br><b style="color:#fff">${esc(authContact)}</b></p>
       <div class="otp-row" id="otp">${[0,1,2,3,4,5].map(i=>`<input inputmode="numeric" maxlength="1" data-i="${i}">`).join('')}</div>
       <button class="grad-btn" id="verify-btn" style="max-width:340px">Sign in <span class="material-symbols-outlined ms-fill" style="font-size:20px">star</span></button>
-      ${window.BK && BK.on ? '' : '<div class="demo-note" style="max-width:340px">Local mode: your code is <b id="demo-code">'+authCode+'</b>.</div>'}
+      ${window.BK && BK.on ? (authMethod==='email' ? '<div class="demo-note" style="max-width:340px">If your email shows a sign-in link instead of a code, just tap the link. It brings you back here already signed in.</div>' : '') : '<div class="demo-note" style="max-width:340px">Local mode: your code is <b id="demo-code">'+authCode+'</b>.</div>'}
       <button style="background:none;border:none;color:var(--ink-40);margin-top:22px;cursor:pointer;font-size:13px" onclick="authStage='enter';render()">Use a different ${authMethod==='email'?'address':'number'}</button>
     </div>`;
   }
@@ -1863,7 +1863,7 @@ const BK = {
   },
   async sendOtp(method, contact){
     if(method==='email'){
-      const { error } = await this.sb.auth.signInWithOtp({ email: contact, options:{ shouldCreateUser:true } });
+      const { error } = await this.sb.auth.signInWithOtp({ email: contact, options:{ shouldCreateUser:true, emailRedirectTo: window.location.origin + window.location.pathname } });
       if(error) throw error;
     } else {
       const { error } = await this.sb.auth.signInWithOtp({ phone: this.normPhone(contact) });
