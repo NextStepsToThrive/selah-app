@@ -1,0 +1,1976 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08040a">
+<title>Selah — Pause, Reflect, Discern</title>
+<meta name="description" content="A multi-faith spiritual sanctuary for journaling, discernment, and reflection.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,400;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<style>
+/* ============ SELAH DESIGN SYSTEM — Galaxy Celestial (single-theme dark commit) ============ */
+:root{
+  --bg:#08040a;
+  --bg-deep:#050208;
+  --primary:#ad2bee;
+  --teal:#2beee3;
+  --gold:#ffd700;
+  --ink:#ffffff;
+  --ink-70:rgba(255,255,255,.7);
+  --ink-50:rgba(255,255,255,.5);
+  --ink-40:rgba(255,255,255,.4);
+  --ink-30:rgba(255,255,255,.3);
+  --glass:rgba(255,255,255,.04);
+  --glass-border:rgba(255,255,255,.1);
+  --danger:#ff5d7a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(173,43,238,.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 40%, rgba(43,238,227,.09) 0%, transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(173,43,238,.08) 0%, transparent 50%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--ink);
+  min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
+}
+body:not(.icons-ready) .material-symbols-outlined{opacity:0}
+.material-symbols-outlined{transition:opacity .2s;
+  font-family:'Material Symbols Outlined';
+  font-weight:normal;font-style:normal;font-size:24px;line-height:1;
+  letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;
+  word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+}
+.ms-fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.star-field{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle, #ffffff .6px, transparent .6px);
+  background-size:60px 60px;opacity:.12;
+}
+#app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100dvh}
+.screen{display:none;min-height:100dvh;padding-bottom:150px;animation:fadein .35s ease}
+.screen.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+body.calm *{animation:none!important;transition:none!important}
+
+/* glass + buttons */
+.glass{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border)}
+.grad{background:linear-gradient(90deg,var(--primary) 0%,var(--teal) 100%)}
+.grad-btn{
+  background:linear-gradient(90deg,var(--primary) 0%,var(--teal) 100%);
+  border:none;color:#fff;font-family:inherit;font-weight:700;cursor:pointer;
+  border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .15s ease;width:100%;padding:16px;
+  font-size:13px;text-transform:uppercase;letter-spacing:.15em;
+  box-shadow:0 8px 30px rgba(173,43,238,.25);
+}
+.grad-btn:active{transform:scale(.98)}
+.grad-btn:disabled{opacity:.4;cursor:default}
+.ghost-btn{
+  background:var(--glass);border:1px solid var(--glass-border);color:var(--ink-70);
+  font-family:inherit;font-weight:600;cursor:pointer;border-radius:14px;padding:13px;
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  font-size:12px;text-transform:uppercase;letter-spacing:.1em;
+}
+button{font-family:inherit}
+input,textarea,select{
+  font-family:inherit;color:var(--ink);background:rgba(255,255,255,.05);
+  border:1px solid var(--glass-border);border-radius:14px;padding:14px 16px;
+  font-size:15px;width:100%;outline:none;
+}
+input:focus,textarea:focus,select:focus{border-color:rgba(43,238,227,.45);box-shadow:0 0 0 1px rgba(43,238,227,.2)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.25)}
+select{appearance:none;-webkit-appearance:none}
+label.field-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--ink-40);margin-bottom:8px}
+
+/* typographic utilities */
+.eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--ink-40)}
+.tagline{font-size:10px;font-weight:700;letter-spacing:.42em;text-transform:uppercase;color:#bf8bff;text-shadow:0 0 12px rgba(191,139,255,.6)}
+.accent-p{color:var(--primary)}
+.accent-t{color:var(--teal)}
+h1.screen-title{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.px{padding-left:22px;padding-right:22px}
+.section{margin-bottom:26px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card{border-radius:24px;padding:20px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
+  background:rgba(43,238,227,.1);border:1px solid rgba(43,238,227,.3);color:var(--teal);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+}
+.chip.purple{background:rgba(173,43,238,.12);border-color:rgba(173,43,238,.35);color:#cf7bff}
+.chip.dim{background:rgba(255,255,255,.05);border-color:var(--glass-border);color:var(--ink-50)}
+
+/* header */
+.app-header{
+  position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:rgba(8,4,10,.7);border-bottom:1px solid rgba(255,255,255,.05);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:38px;height:38px;border-radius:50%;box-shadow:0 0 16px rgba(173,43,238,.45)}
+.brand .b-title{font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1}
+.brand .b-sub{font-size:8px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-40);margin-top:4px}
+.avatar-btn{
+  width:38px;height:38px;border-radius:50%;cursor:pointer;border:1px solid rgba(173,43,238,.45);
+  background:linear-gradient(135deg,rgba(173,43,238,.3),rgba(43,238,227,.25));
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;box-shadow:0 0 14px rgba(173,43,238,.3);
+}
+
+/* bottom nav */
+#bottom-nav{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:100;
+  width:min(92%,396px);height:76px;border-radius:999px;
+  background:rgba(7,4,10,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 50px rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:space-around;padding:0 10px;
+}
+#bottom-nav.visible{display:flex}
+.nav-btn{
+  background:none;border:none;cursor:pointer;color:var(--ink-30);
+  display:flex;flex-direction:column;align-items:center;gap:3px;width:56px;padding:6px 0;
+}
+.nav-btn span.lbl{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.nav-btn.on{color:var(--teal)}
+.nav-btn.on .material-symbols-outlined{filter:drop-shadow(0 0 8px rgba(43,238,227,.5))}
+.fab{
+  width:62px;height:62px;border-radius:50%;border:5px solid var(--bg-deep);cursor:pointer;
+  background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;
+  display:flex;align-items:center;justify-content:center;margin-top:-46px;
+  box-shadow:0 0 30px rgba(173,43,238,.5);transition:transform .15s ease;
+}
+.fab:active{transform:scale(.92)}
+
+/* auth */
+.auth-wrap{display:flex;flex-direction:column;align-items:center;padding:56px 30px 40px;min-height:100dvh}
+.auth-logo{width:150px;height:150px;border-radius:50%;box-shadow:0 0 60px rgba(124,58,237,.4);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.auth-name{font-size:52px;font-weight:700;letter-spacing:-.02em;margin-top:26px}
+.auth-name .lah{background:linear-gradient(90deg,#fff,#a78bfa,#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.method-toggle{display:flex;gap:6px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);border-radius:16px;padding:5px;width:100%;margin-bottom:16px}
+.method-toggle button{
+  flex:1;background:none;border:none;border-radius:12px;color:var(--ink-40);cursor:pointer;
+  padding:11px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.method-toggle button.on{background:rgba(173,43,238,.2);border:1px solid rgba(173,43,238,.35);color:#fff}
+.field-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;padding:14px 20px;width:100%}
+.field-card input{background:none;border:none;padding:6px 0 0;font-size:16px;box-shadow:none}
+.field-card input:focus{box-shadow:none}
+.otp-row{display:flex;gap:10px;justify-content:center;margin:18px 0}
+.otp-row input{width:48px;height:58px;text-align:center;font-size:24px;font-weight:700;padding:0}
+.demo-note{
+  margin-top:16px;border-radius:14px;padding:12px 16px;width:100%;
+  background:rgba(43,238,227,.07);border:1px dashed rgba(43,238,227,.35);
+  font-size:12px;color:var(--ink-70);line-height:1.5;
+}
+.demo-note b{color:var(--teal);letter-spacing:.1em}
+
+/* onboarding */
+.ob-progress{display:flex;gap:6px;margin:20px 0 26px}
+.ob-progress i{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
+.ob-progress i.done{background:linear-gradient(90deg,var(--primary),var(--teal))}
+.opt-card{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;
+  background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:15px 16px;
+  color:var(--ink-70);font-size:14px;font-weight:500;margin-bottom:10px;transition:border-color .15s;
+}
+.opt-card .material-symbols-outlined{color:var(--ink-40);font-size:22px}
+.opt-card.on{border-color:var(--teal);background:rgba(43,238,227,.08);color:#fff;box-shadow:0 0 14px rgba(43,238,227,.18)}
+.opt-card.on .material-symbols-outlined{color:var(--teal)}
+.opt-card small{display:block;font-size:11px;color:var(--ink-40);font-weight:400;margin-top:2px}
+.comfort-row{margin-bottom:20px}
+.comfort-row .cr-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.comfort-row .cr-name{font-size:13px;font-weight:600}
+.comfort-row .cr-val{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal)}
+.dots{display:flex;gap:8px}
+.dots button{
+  flex:1;height:34px;border-radius:10px;border:1px solid var(--glass-border);
+  background:rgba(255,255,255,.04);color:var(--ink-40);font-weight:700;cursor:pointer;font-size:13px;
+}
+.dots button.on{background:linear-gradient(135deg,rgba(173,43,238,.4),rgba(43,238,227,.3));border-color:rgba(43,238,227,.5);color:#fff}
+
+/* emotions + clairs */
+.emo-row{display:flex;justify-content:space-between;background:rgba(255,255,255,.02);border:1px solid var(--glass-border);border-radius:32px;padding:14px}
+.emo{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--ink-30)}
+.emo .ic{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center}
+.emo span.lbl{font-size:9px;text-transform:uppercase;letter-spacing:-.02em}
+.emo.on{color:var(--primary)}
+.emo.on .ic{background:rgba(173,43,238,.2);border-color:rgba(173,43,238,.45);box-shadow:0 0 18px rgba(173,43,238,.4);color:var(--primary)}
+.clair-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 6px;background:rgba(255,255,255,.01);border:1px solid var(--glass-border);border-radius:24px;padding:18px 12px}
+.clair{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--ink-50)}
+.clair .ic{width:46px;height:46px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center}
+.clair span.lbl{font-size:8px;text-transform:uppercase;text-align:center;line-height:1.15;letter-spacing:-.02em;opacity:.65}
+.clair.on{color:var(--teal)}
+.clair.on .ic{border-color:var(--teal);background:rgba(43,238,227,.1);box-shadow:0 0 14px rgba(43,238,227,.4)}
+.clair.on span.lbl{opacity:1;font-weight:700}
+
+/* journal */
+.jr-textarea{min-height:170px;resize:vertical;font-size:16px;line-height:1.6;font-weight:300;border-radius:20px}
+.sym-found{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hl{color:var(--teal);background:rgba(43,238,227,.1);padding:0 4px;border-radius:4px;font-weight:600}
+.insight-card{background:linear-gradient(135deg,rgba(173,43,238,.12),rgba(43,238,227,.06));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:20px;font-size:14px;line-height:1.65;color:rgba(255,255,255,.9)}
+.sq-item{display:flex;gap:14px;padding:15px 16px;border-bottom:1px solid rgba(255,255,255,.05);align-items:flex-start}
+.sq-item:last-child{border-bottom:none}
+.sq-item .num{color:var(--primary);font-weight:700;font-size:13px}
+.sq-item p{font-size:13px;color:var(--ink-70);line-height:1.5}
+.crisis-card{background:rgba(255,93,122,.08);border:1px solid rgba(255,93,122,.35);border-radius:18px;padding:18px;line-height:1.6;font-size:13px}
+.crisis-card b{color:#ff8fa3}
+.seg{display:flex;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;background:none;border:none;border-radius:10px;color:var(--ink-40);cursor:pointer;padding:9px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;gap:6px}
+.seg button.on{background:rgba(173,43,238,.22);color:#fff;border:1px solid rgba(173,43,238,.35)}
+
+/* streak + charts */
+.streak-row{display:flex;justify-content:space-between}
+.streak-day{display:flex;flex-direction:column;align-items:center;gap:8px}
+.streak-day .d{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--ink-40)}
+.streak-day .n{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.1);color:var(--ink-30)}
+.streak-day.hit .n{background:linear-gradient(135deg,var(--primary),var(--teal));border:none;color:#fff;box-shadow:0 0 12px rgba(43,238,227,.4)}
+.bars{display:flex;align-items:flex-end;gap:9px;height:120px;margin-top:16px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bar{width:100%;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--teal),var(--primary));min-height:3px;opacity:.85}
+.bar-col .d{font-size:8px;color:var(--ink-30);text-transform:uppercase;font-weight:700}
+
+/* moments list */
+.moment-card{border-radius:22px;padding:18px;margin-bottom:14px}
+.moment-card .m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.moment-card .m-text{font-size:14px;line-height:1.6;color:var(--ink-70);font-weight:300}
+.icon-mini{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass);
+  color:var(--ink-50);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+}
+
+/* library */
+.pill-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.pill-row::-webkit-scrollbar{display:none}
+.pill{
+  flex-shrink:0;padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.05);cursor:pointer;
+  border:1px solid rgba(255,255,255,.08);color:var(--ink-50);font-size:11px;font-weight:700;
+}
+.pill.on{border-color:rgba(173,43,238,.6);background:rgba(173,43,238,.2);color:#fff;box-shadow:0 4px 14px rgba(173,43,238,.2)}
+.lib-card{border-radius:24px;overflow:hidden;margin-bottom:18px}
+.lib-hero{height:96px;position:relative;display:flex;align-items:flex-end;padding:14px 18px}
+.lib-hero .glyph{position:absolute;right:16px;top:12px;font-size:44px;opacity:.35;color:var(--teal)}
+.lib-body{display:grid;grid-template-columns:1fr 1fr}
+.lib-body>div{padding:14px}
+.lib-body h4{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:7px}
+.lib-body p,.lib-body textarea{font-size:11px;line-height:1.55;color:var(--ink-70)}
+.lib-body textarea{background:none;border:none;padding:0;resize:none;min-height:56px;font-style:italic;border-radius:0}
+.lib-body textarea:focus{box-shadow:none}
+
+/* moon */
+.moon-vis{width:74px;height:74px;border-radius:50%;position:relative;overflow:hidden;background:#1c1c22;box-shadow:inset -4px -4px 12px rgba(0,0,0,.8), 0 0 20px rgba(255,255,255,.08)}
+.moon-lit{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 35%, #e8e8ee 0%, #b9b9c4 70%, #9a9aa6 100%)}
+
+/* keypad */
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 30px;max-width:280px;margin:0 auto}
+.key{
+  width:74px;height:74px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-border);
+  color:rgba(248,250,252,.9);font-size:26px;font-weight:300;cursor:pointer;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.key:active{border-color:rgba(15,221,240,.6);box-shadow:0 0 20px rgba(15,221,240,.25)}
+.pin-dots{display:flex;gap:22px;justify-content:center;margin:26px 0 34px}
+.pin-dots i{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05)}
+.pin-dots i.fill{background:var(--teal);border:none;box-shadow:0 0 12px var(--teal)}
+
+/* modal */
+.modal-veil{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at 50% 50%, rgba(173,43,238,.22) 0%, rgba(8,4,10,.94) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.modal-veil.open{display:flex}
+.modal-card{width:100%;max-width:370px;border-radius:34px;padding:28px;background:rgba(24,14,30,.85);border:1px solid rgba(173,43,238,.35);box-shadow:0 8px 40px rgba(0,0,0,.6);max-height:88dvh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:20px;right:20px;background:none;border:none;color:var(--ink-30);cursor:pointer}
+.price-opt{display:flex;justify-content:space-between;align-items:center;padding:18px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer;margin-bottom:12px;position:relative}
+.price-opt.on{border:2px solid rgba(173,43,238,.6)}
+.radio{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.price-opt.on .radio{border-color:var(--primary)}
+.price-opt.on .radio::after{content:'';width:11px;height:11px;border-radius:50%;background:var(--primary)}
+.save-badge{position:absolute;top:-10px;right:14px;background:var(--teal);color:var(--bg-deep);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:4px 10px;border-radius:99px}
+
+/* pulse */
+.pulse-card{border-radius:28px;padding:20px;margin-bottom:16px}
+.pulse-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.pulse-ava{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,rgba(173,43,238,.5),rgba(43,238,227,.4));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;border:2px solid rgba(255,255,255,.12)}
+.sym-circle{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)}
+
+/* petition/victory cards */
+.masonry{column-count:2;column-gap:12px}
+.masonry-item{break-inside:avoid;margin-bottom:12px}
+.toast{
+  position:fixed;bottom:110px;left:50%;transform:translateX(-50%);z-index:300;
+  background:rgba(20,12,26,.95);border:1px solid rgba(43,238,227,.4);border-radius:14px;
+  padding:12px 20px;font-size:13px;font-weight:500;color:#fff;display:none;max-width:88%;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);text-align:center;
+}
+.toast.show{display:block;animation:fadein .3s ease}
+.serif-quote{font-family:'Noto Serif',serif;font-style:italic;font-size:20px;line-height:1.55;text-align:center}
+.divider-dot{width:32px;height:1px;background:rgba(255,255,255,.2);margin:14px auto}
+.hidden{display:none!important}
+a{color:var(--teal)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="star-field"></div>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+<div id="modal-veil" class="modal-veil"><div id="modal-card" class="modal-card"></div></div>
+
+<script>
+/* ================================================================
+   SELAH — Pause • Reflect • Discern
+   Prototype build. All data stays in this browser (local storage).
+   ================================================================ */
+const LOGO = "data:image/webp;base64,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";
+
+/* ---------- safe storage ---------- */
+const store = {
+  get(){ try{ const raw = localStorage.getItem('selah_v1'); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } },
+  set(s){ try{ localStorage.setItem('selah_v1', JSON.stringify(s)); }catch(e){} }
+};
+
+/* ---------- state ---------- */
+let S = store.get() || {
+  auth:null, onboarded:false,
+  user:{ soulName:'', divineName:'The Divine', lens:'Universal', explorer:true,
+    comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
+    gifts:[], growth:[], relational:'', season:'', processing:'', tier:'free' },
+  moments:[], petitions:[], rituals:[], revelations:{}, pulse:[], pulseActs:{},
+  vaultPin:null, calm:false, discernsToday:{date:'',count:0}, streak:[]
+};
+function save(){ store.set(S); if(window.BK && BK.on && BK.session) BK.schedulePush(); }
+/* Testing phase: every soul gets Pro free */
+S.user.tier = 'pro'; save();
+
+/* ---------- lens translation maps ---------- */
+const LENSES = ['Christian','Islamic','Jewish','Buddhist','Hindu','African Traditional','Indigenous','Mystic','New Age / Metaphysical','Universal'];
+const PLAIN_GIFTS = {'Clairvoyance':'Seeing','Clairaudience':'Hearing','Clairsentience':'Gut Sense','Clairempathy':'Feeling Others','Claircognizance':'Just Knowing','Clairgustance':'Taste Sense','Clairsalience':'Scent Sense','Clairtangency':'Touch Sense','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dreamed It Before'};
+const GIFT_LENS = {
+  Christian:{'Clairvoyance':'Visions','Clairaudience':'Hearing His Voice','Clairsentience':'Discernment','Clairempathy':'Burden Bearing','Claircognizance':'Word of Knowledge','Clairgustance':'Taste Impressions','Clairsalience':'Scent Impressions','Clairtangency':'Touch Impressions','Déjà Vu':'Déjà Vu','Déjà Rêvé':'Dream Echo'},
+  Islamic:{'Clairvoyance':'Kashf (Unveiling)','Clairaudience':'Inner Hearing','Clairsentience':'Firasa (Insight)','Claircognizance':'Given Knowledge','Déjà Rêvé':'True Dream Echo'},
+  Jewish:{'Clairvoyance':'Chazon (Vision)','Clairaudience':'Bat Kol','Clairsentience':'Binah (Understanding)','Claircognizance':"Da'at (Knowing)"},
+  Buddhist:{'Clairvoyance':'Clear Seeing','Clairaudience':'Deep Listening','Clairsentience':'Felt Awareness','Claircognizance':'Direct Knowing'},
+  Hindu:{'Clairvoyance':'Divya Drishti','Clairaudience':'Divya Shrotra','Clairsentience':'Subtle Feeling','Claircognizance':'Pratibha'},
+  'African Traditional':{'Clairvoyance':'Second Sight','Clairaudience':'Ancestral Hearing','Clairsentience':'Body Knowing','Claircognizance':'Deep Knowing'},
+  Indigenous:{'Clairvoyance':'Vision Keeping','Clairaudience':'Spirit Listening','Clairsentience':'Earth Feeling','Claircognizance':'Original Knowing'},
+  Mystic:{}, 'New Age / Metaphysical':{}, Universal:{}
+};
+const METAPHYSICAL_LENSES = ['New Age / Metaphysical','Mystic'];
+const SEASONS = ['Wilderness','Waiting','Awakening','Harvest','Rebuilding','Dark Night'];
+const SEASONS_MAP = {
+  'Wilderness':{Christian:'The Wilderness', Islamic:'Sabr (Patient Endurance)', Jewish:'Bamidbar (In the Desert)', Buddhist:'The Charnel Ground', Hindu:'Vanaprastha Passage', 'African Traditional':'The Crossroads', Indigenous:'The Vision Quest', Mystic:'The Desert of the Soul', 'New Age / Metaphysical':'The Void', Universal:'The Wilderness'},
+  'Dark Night':{Christian:'Dark Night of the Soul', Islamic:'Qabd (Contraction)', Jewish:'Hester Panim', Buddhist:'The Great Doubt', Hindu:'Tamas Passage', 'African Traditional':'The Deep Water', Indigenous:'The Long Winter', Mystic:'Dark Night of the Soul', 'New Age / Metaphysical':'Shadow Integration', Universal:'The Dark Night'},
+  'Awakening':{Christian:'Revival', Islamic:'Yaqzah (Awakening)', Jewish:'Hitorerut', Buddhist:'Bodhi Stirring', Hindu:'Kundalini Rising', 'African Traditional':'The Calling', Indigenous:'First Light', Mystic:'Illumination', 'New Age / Metaphysical':'Ascension', Universal:'Awakening'},
+  'Harvest':{Christian:'The Harvest', Islamic:'Barakah (Abundance)', Jewish:'Sukkot Season', Buddhist:'Ripened Karma', Hindu:'Phala (Fruition)', 'African Traditional':'First Fruits', Indigenous:'The Gathering', Mystic:'Union', 'New Age / Metaphysical':'Manifestation', Universal:'Harvest'},
+  'Waiting':{Christian:'The Waiting Room', Islamic:'Tawakkul (Trusting Reliance)', Jewish:'Kavanah of Patience', Buddhist:'Sitting with What Is', Hindu:'Titiksha (Forbearance)', 'African Traditional':'Listening Time', Indigenous:'The Still Season', Mystic:'Holy Indifference', 'New Age / Metaphysical':'Divine Timing', Universal:'Waiting'},
+  'Rebuilding':{Christian:'Restoration', Islamic:'Islah (Repair)', Jewish:'Tikkun (Mending)', Buddhist:'Beginning Again', Hindu:'Punar Nirman', 'African Traditional':'Raising the House', Indigenous:'New Fire', Mystic:'Reformation', 'New Age / Metaphysical':'Recalibration', Universal:'Rebuilding'}
+};
+const DIVINE_NAMES = ['God','The Divine','Source','Spirit','The Universe','The Most High','Creator'];
+const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','Sufi Poetry','A blend of many'];
+const LENS_BOOK = {Christian:'The Bible', Islamic:'The Qur\u2019an', Jewish:'The Tanakh', Hindu:'The Bhagavad Gita', Buddhist:'The Dhammapada', Mystic:'Sufi Poetry'};
+function userBook(){
+  if(S.user.holyBookCustom) return S.user.holyBookCustom;
+  if(S.user.holyBook && S.user.holyBook!=='auto') return S.user.holyBook;
+  return LENS_BOOK[S.user.lens] || 'A blend of many';
+}
+function seasonLabel(s){ const m = SEASONS_MAP[s]; return m ? (m[S.user.lens]||s) : s; }
+function giftLabel(g, lens){
+  lens = lens || S.user.lens;
+  if(METAPHYSICAL_LENSES.includes(lens)) return g;
+  return (GIFT_LENS[lens]||{})[g] || PLAIN_GIFTS[g] || g;
+}
+/* UI vocabulary that adapts to the user's lens */
+const VOCAB = {
+  abrahamic:{ senses:'Spiritual Gifts', sensesHint:'how it came to you', discernCta:'Ask Selah to Discern', discernNoun:'discernment', insight:'Discernment',
+    petitionsTitle:'Prayer Requests', petitionOne:'prayer request', addPetition:'New Prayer Request', placeCta:'Add to the Wall', markDone:'Mark as Answered',
+    wall:'Answered Prayers', activeShort:'Prayer Requests', pulseTab1:'Prayer Wall', pulseTab2:'Praise Reports', shareCta:'Share a Praise Report',
+    act1:'Pray for This', act2:'Rejoice with Them', logRitual:'Log a Spiritual Practice', paths:'Practices', qTitle:'Questions to Sit With' },
+  metaphysical:{ senses:'Clair Senses', sensesHint:'multimodal perception', discernCta:'Ask Selah to Discern', discernNoun:'discernment', insight:'Discernment',
+    petitionsTitle:'Active Intentions', petitionOne:'intention', addPetition:'New Intention', placeCta:'Set the Intention', markDone:'Mark as Manifested',
+    wall:'Manifested Intentions', activeShort:'Intentions', pulseTab1:'Active Intentions', pulseTab2:'Shared Victories', shareCta:'Share Your Victory',
+    act1:'Hold in Light', act2:'Celebrate With Them', logRitual:'Begin Ritual Log', paths:'Ritual Paths', qTitle:'Questions to Sit With' },
+  universal:{ senses:'How It Came to You', sensesHint:'optional', discernCta:'Ask Selah to Reflect', discernNoun:'reflection', insight:'Reflection',
+    petitionsTitle:'Intentions', petitionOne:'intention', addPetition:'New Intention', placeCta:'Save It', markDone:'Mark as Fulfilled',
+    wall:'Fulfilled Intentions', activeShort:'Intentions', pulseTab1:'Intentions', pulseTab2:'Good News', shareCta:'Share Some Good News',
+    act1:'Send Support', act2:'Celebrate With Them', logRitual:'Log a Practice', paths:'Practices', qTitle:'Questions to Sit With' }
+};
+function T(key){
+  const lens = S.user.lens;
+  const v = (lens==='Christian'||lens==='Islamic'||lens==='Jewish') ? VOCAB.abrahamic
+    : METAPHYSICAL_LENSES.includes(lens) ? VOCAB.metaphysical : VOCAB.universal;
+  return v[key] || VOCAB.universal[key] || key;
+}
+
+/* ---------- clairs ---------- */
+const CLAIRS = [
+  {k:'Clairvoyance', icon:'visibility'},{k:'Clairaudience', icon:'hearing'},
+  {k:'Clairsentience', icon:'touch_app'},{k:'Clairempathy', icon:'favorite'},
+  {k:'Claircognizance', icon:'lightbulb'},{k:'Clairgustance', icon:'restaurant'},
+  {k:'Clairsalience', icon:'air'},{k:'Clairtangency', icon:'pan_tool'},
+  {k:'Déjà Vu', icon:'history'},{k:'Déjà Rêvé', icon:'bedtime'}
+];
+const CLAIR_INFO = {
+  'Clairvoyance':{desc:'Seeing images, visions, or inner pictures that carry meaning.', syn:'clear seeing, visions, the seer gift, second sight'},
+  'Clairaudience':{desc:'Hearing words, names, or sounds inwardly, beyond the ears.', syn:'clear hearing, the still small voice, inner hearing'},
+  'Clairsentience':{desc:'A physical or gut feeling that carries information.', syn:'clear feeling, discernment, gut knowing'},
+  'Clairempathy':{desc:'Feeling other people\'s emotions as if they were your own.', syn:'empath sense, burden bearing, emotional attunement'},
+  'Claircognizance':{desc:'Simply knowing something, without knowing how you know.', syn:'clear knowing, word of knowledge, direct knowing'},
+  'Clairgustance':{desc:'Tasting something that has no physical source.', syn:'clear tasting'},
+  'Clairsalience':{desc:'Smelling a scent with no physical source, like perfume or smoke.', syn:'clear smelling, clairalience'},
+  'Clairtangency':{desc:'Picking up impressions through touch, from objects or places.', syn:'clear touching, psychometry'},
+  'Déjà Vu':{desc:'The strong sense that this exact moment has happened before.', syn:'already seen'},
+  'Déjà Rêvé':{desc:'Recognizing a waking moment from an earlier dream.', syn:'already dreamed, dream memory'}
+};
+const EMOTIONS = [
+  {k:'Sadness', icon:'heart_broken'},{k:'Anxiety', icon:'warning'},
+  {k:'Awe', icon:'auto_awesome'},{k:'Peace', icon:'self_improvement'},{k:'Joy', icon:'wb_sunny'}
+];
+
+/* ---------- symbol dictionary ---------- */
+const SYMBOLS = {
+  'dove':{name:'White Dove', icon:'flutter_dash', meaning:'Peace, a divine messenger, presence of Spirit. A new beginning after the storm.'},
+  'hummingbird':{name:'Hummingbird', icon:'raven', meaning:'Joy that hovers in impossible stillness. A call to taste the sweetness of the present moment.'},
+  'oak':{name:'Oak Tree', icon:'park', meaning:'Deep roots, endurance, generational strength. What you are building will outlast the season.'},
+  'mountain':{name:'The Mountain', icon:'landscape', meaning:'Stability, overcoming obstacles, the meeting of heaven and earth. Resilience in the ascent.'},
+  'water':{name:'Water', icon:'water_drop', meaning:'Emotion, cleansing, the subconscious. Pay attention to what moves beneath the surface.'},
+  'ocean':{name:'Ocean', icon:'waves', meaning:'The vast unconscious, surrender, the source that holds all currents.'},
+  'river':{name:'River', icon:'waves', meaning:'The flow of life carrying you forward. Resistance is optional.'},
+  'star':{name:'Stars', icon:'star', meaning:'Guidance, destiny, light that persists through darkness. Navigation for the soul.'},
+  'moon':{name:'The Moon', icon:'dark_mode', meaning:'Cycles, intuition, the feminine principle. What waxes must wane, and return.'},
+  'sun':{name:'The Sun', icon:'wb_sunny', meaning:'Vitality, clarity, the illuminated self. Truth stepping into full view.'},
+  'snake':{name:'Serpent', icon:'gesture', meaning:'Transformation, shedding of old skin, healing wisdom. Death of one form, birth of another.'},
+  'bird':{name:'Birds', icon:'flutter_dash', meaning:'Messages between worlds, perspective, freedom. Listen to what arrives on wings.'},
+  'owl':{name:'Owl', icon:'visibility', meaning:'Wisdom in darkness, seeing what others miss, a threshold guardian.'},
+  'butterfly':{name:'Butterfly', icon:'emoji_nature', meaning:'Metamorphosis complete. The cocoon season served its purpose.'},
+  'feather':{name:'Feather', icon:'stylus_note', meaning:'A calling card from the unseen. Confirmation that you are accompanied.'},
+  'egg':{name:'Egg', icon:'egg', meaning:'Potential, new life gestating, the sacred not-yet. Double portions signal abundance.'},
+  'fire':{name:'Fire', icon:'local_fire_department', meaning:'Purification, passion, the refining process. What burns away was never yours to keep.'},
+  'light':{name:'Light', icon:'flare', meaning:'Revelation, presence, guidance breaking through. The dawn keeps its promise.'},
+  'door':{name:'Door', icon:'door_open', meaning:'Threshold, opportunity, a decision waiting. Some doors close so the right one is unmistakable.'},
+  'key':{name:'Key', icon:'key', meaning:'Access, answers, authority being handed to you. The lock has been waiting.'},
+  'stairs':{name:'Stairs / Ascension', icon:'stairs', meaning:'Step-by-step elevation. Growth that honors process over leaps.'},
+  'bridge':{name:'Bridge', icon:'route', meaning:'Transition between chapters. You are neither where you were nor where you are going.'},
+  'tree':{name:'Tree', icon:'park', meaning:'Rootedness and reach at once. Growth in two directions: deeper and higher.'},
+  'garden':{name:'Garden', icon:'psychiatry', meaning:'Cultivation, patience, tending what is yours. Harvest honors the quiet work.'},
+  'rain':{name:'Rain', icon:'rainy', meaning:'Release, blessing, cleansing from above. What falls also feeds.'},
+  'storm':{name:'Storm', icon:'thunderstorm', meaning:'Upheaval that clears the air. Turbulence before a new atmosphere.'},
+  'lion':{name:'Lion', icon:'pets', meaning:'Courage, sovereignty, righteous boldness. Your voice carries further than you think.'},
+  'wolf':{name:'Wolf', icon:'pets', meaning:'Instinct, loyalty, the wild teacher. Trust the pack you choose and the nose you were given.'},
+  'baby':{name:'Baby / Birth', icon:'child_care', meaning:'A new thing being born through you. Handle beginnings gently.'},
+  'death':{name:'Death (symbolic)', icon:'psychology', meaning:'An ending that makes room. In dream language, death is almost always transformation.'},
+  'teeth':{name:'Teeth', icon:'dentistry', meaning:'Anxiety about voice, power, or appearance. What are you holding back from saying?'},
+  'flying':{name:'Flying', icon:'travel', meaning:'Liberation, rising above circumstance, spiritual elevation.'},
+  'falling':{name:'Falling', icon:'south', meaning:'Loss of control, surrender being asked of you. Sometimes the invitation is to let go on purpose.'},
+  'house':{name:'House', icon:'home', meaning:'The self, the soul’s architecture. New rooms mean undiscovered capacity.'},
+  '11:11':{name:'11:11', icon:'schedule', meaning:'Alignment, a portal moment, confirmation you are on path. Pause and set intention.'},
+  '111':{name:'111', icon:'schedule', meaning:'New beginnings, thoughts becoming things. Watch your focus.'},
+  '222':{name:'222', icon:'schedule', meaning:'Balance, partnership, trust the process. Seeds are germinating unseen.'},
+  '333':{name:'333', icon:'schedule', meaning:'Divine support surrounds you. Body, mind, and spirit asking for alignment.'},
+  '444':{name:'444', icon:'schedule', meaning:'Protection and foundation. You are being steadied.'},
+  '555':{name:'555', icon:'schedule', meaning:'Change is in motion. Stay flexible.'},
+  '777':{name:'777', icon:'schedule', meaning:'Spiritual completion, rest, sacred luck. Selah.'},
+  'jasmine':{name:'Jasmine', icon:'emoji_nature', meaning:'Purity, sensual sweetness, night-blooming grace. Beauty that opens in darkness.'},
+  'rainbow':{name:'Rainbow', icon:'looks', meaning:'Covenant, promise after the flood, the full spectrum held in one arc.'}
+};
+const SYM_ALIASES = {
+  'doves':'dove','hummingbirds':'hummingbird','oaks':'oak','mountains':'mountain','stars':'star','birds':'bird','owls':'owl','butterflies':'butterfly','feathers':'feather','eggs':'egg','yolk':'egg','doors':'door','keys':'key','trees':'tree','snakes':'snake','serpent':'snake','lions':'lion','wolves':'wolf','staircase':'stairs','ladder':'stairs','flood':'storm','lightning':'storm','babies':'baby','dying':'death','died':'death','fly':'flying','flew':'flying','fell':'falling','rivers':'river','oceans':'ocean','sea':'ocean','raining':'rain','1111':'11:11'
+};
+
+/* ---------- crisis detection ---------- */
+const CRISIS_RE = /\b(kill myself|end my life|suicide|suicidal|self.?harm|hurt myself|don'?t want to (live|be here)|no reason to live|better off dead)\b/i;
+
+/* ---------- moon phase ---------- */
+function moonPhase(d){
+  const synodic = 29.53058867;
+  const known = Date.UTC(2000,0,6,18,14)/86400000; // known new moon
+  const days = d.getTime()/86400000 - known;
+  const age = ((days % synodic) + synodic) % synodic;
+  const frac = age / synodic;
+  let name, hint;
+  if(frac < 0.033 || frac > 0.967){ name='New Moon'; hint='New beginnings, planting intention'; }
+  else if(frac < 0.216){ name='Waxing Crescent'; hint='Momentum, first steps'; }
+  else if(frac < 0.284){ name='First Quarter'; hint='Decision, commitment'; }
+  else if(frac < 0.466){ name='Waxing Gibbous'; hint='Refinement, ideal for growth'; }
+  else if(frac < 0.534){ name='Full Moon'; hint='Illumination, release, gratitude'; }
+  else if(frac < 0.716){ name='Waning Gibbous'; hint='Harvest, giving thanks'; }
+  else if(frac < 0.784){ name='Last Quarter'; hint='Release, forgiveness'; }
+  else { name='Waning Crescent'; hint='Rest, surrender, deep listening'; }
+  const daysToNew = Math.ceil(synodic - age) % 30;
+  return {name, hint, frac, age, daysToNew};
+}
+
+/* ---------- sacred texts (rotating, lens aware) ---------- */
+const TEXTS = {
+  Christian:[['Be still, and know that I am God.','Psalm 46:10'],['The light shines in the darkness, and the darkness has not overcome it.','John 1:5'],['He leads me beside still waters. He restores my soul.','Psalm 23:2-3']],
+  Islamic:[['Verily, in the remembrance of God do hearts find rest.','Qur’an 13:28'],['So truly, with hardship comes ease.','Qur’an 94:5'],['God is the Light of the heavens and the earth.','Qur’an 24:35']],
+  Jewish:[['Be still before the Lord and wait patiently.','Psalm 37:7'],['The soul of man is the lamp of God.','Proverbs 20:27'],['In quietness and trust shall be your strength.','Isaiah 30:15']],
+  Buddhist:[['Peace comes from within. Do not seek it without.','Attributed to the Buddha'],['You yourself, as much as anybody, deserve your love and affection.','Buddhist teaching'],['The mind is everything. What you think, you become.','Dhammapada (paraphrase)']],
+  Hindu:[['The soul is neither born, and nor does it die.','Bhagavad Gita 2:20'],['Yoga is the journey of the self, through the self, to the self.','Bhagavad Gita'],['When meditation is mastered, the mind is unwavering like a flame in a windless place.','Bhagavad Gita 6:19']],
+  'African Traditional':[['However far the stream flows, it never forgets its source.','Yoruba proverb'],['The ancestors speak in the quiet between heartbeats.','Traditional wisdom'],['Wisdom is like a baobab tree; no one individual can embrace it.','Akan proverb']],
+  Indigenous:[['Listen to the wind, it talks. Listen to the silence, it speaks.','Native wisdom'],['We do not inherit the earth from our ancestors; we borrow it from our children.','Indigenous teaching'],['The heart knows the way. Walk in beauty.','Diné blessing (paraphrase)']],
+  Mystic:[['The wound is the place where the Light enters you.','Rumi'],['Silence is the language of God; all else is poor translation.','Rumi'],['What you seek is seeking you.','Rumi']],
+  'New Age / Metaphysical':[['You are not a drop in the ocean. You are the entire ocean in a drop.','Rumi'],['Energy flows where attention goes.','Metaphysical principle'],['As above, so below; as within, so without.','Hermetic axiom']],
+  Universal:[['Be still. Pause, reflect, discern.','Selah'],['The quieter you become, the more you are able to hear.','Contemplative wisdom'],['This too is a threshold. Cross it slowly.','Selah']]
+};
+const BOOK_TEXTS = {
+  'The Bible':[['Be still, and know that I am God.','Psalm 46:10'],['The light shines in the darkness, and the darkness has not overcome it.','John 1:5'],['In quietness and trust shall be your strength.','Isaiah 30:15'],['He leads me beside still waters. He restores my soul.','Psalm 23:2-3']],
+  'The Qur\u2019an':[['Verily, in the remembrance of God do hearts find rest.','Qur\u2019an 13:28'],['So truly, with hardship comes ease.','Qur\u2019an 94:5'],['God is the Light of the heavens and the earth.','Qur\u2019an 24:35']],
+  'The Tanakh':[['Be still before the Lord and wait patiently.','Psalm 37:7'],['The soul of man is the lamp of God.','Proverbs 20:27'],['Act justly, love mercy, walk humbly with your God.','Micah 6:8']],
+  'The Bhagavad Gita':[['The soul is neither born, and nor does it die.','Bhagavad Gita 2:20'],['When meditation is mastered, the mind is unwavering like a flame in a windless place.','Bhagavad Gita 6:19'],['Yoga is the journey of the self, through the self, to the self.','Bhagavad Gita']],
+  'The Dhammapada':[['The mind is everything. What you think, you become.','Dhammapada (paraphrase)'],['Peace comes from within. Do not seek it without.','Attributed to the Buddha'],['Better than a thousand hollow words is one word that brings peace.','Dhammapada 100']],
+  'Sufi Poetry':[['The wound is the place where the Light enters you.','Rumi'],['What you seek is seeking you.','Rumi'],['Silence is the language of God; all else is poor translation.','Rumi']]
+};
+function dailyText(){
+  const day = Math.floor(Date.now()/86400000);
+  const book = userBook();
+  if(BOOK_TEXTS[book]) return BOOK_TEXTS[book][day % BOOK_TEXTS[book].length];
+  const list = TEXTS[S.user.lens] || TEXTS.Universal;
+  return list[day % list.length];
+}
+
+/* ---------- helpers ---------- */
+function esc(t){ return String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayKey(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmtDate(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+function toast(msg, ms){ const t=document.getElementById('toast'); t.innerHTML=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), ms||2600); }
+function initialOf(){ return (S.user.soulName||'S').trim().charAt(0).toUpperCase(); }
+function markStreak(){ const k=todayKey(); if(!S.streak.includes(k)){ S.streak.push(k); } }
+function streakCount(){
+  let c=0; const d=new Date();
+  if(!S.streak.includes(todayKey(d))) d.setDate(d.getDate()-1);
+  while(S.streak.includes(todayKey(d))){ c++; d.setDate(d.getDate()-1); }
+  return c;
+}
+function detectSymbols(text){
+  const found=[]; const lower=' '+text.toLowerCase()+' ';
+  const check=(token,key)=>{
+    const re = /^[\d:]+$/.test(token) ? new RegExp('(^|\\D)'+token.replace(':','\\:')+'(\\D|$)') : new RegExp('\\b'+token+'\\b');
+    if(re.test(lower) && !found.includes(key)) found.push(key);
+  };
+  Object.keys(SYMBOLS).forEach(k=>check(k.toLowerCase(),k));
+  Object.keys(SYM_ALIASES).forEach(a=>check(a, SYM_ALIASES[a]));
+  const SUBSUMED = {'oak':'tree','ocean':'water','river':'water','storm':'rain','garden':'tree'};
+  Object.entries(SUBSUMED).forEach(([spec,gen])=>{ if(found.includes(spec) && found.includes(gen)) found.splice(found.indexOf(gen),1); });
+  return found;
+}
+function highlightText(text, syms){
+  let safe = esc(text);
+  const tokens = new Set();
+  syms.forEach(k=>{ tokens.add(k); Object.keys(SYM_ALIASES).forEach(a=>{ if(SYM_ALIASES[a]===k) tokens.add(a); }); });
+  tokens.forEach(tok=>{
+    const re = /^[\d:]+$/.test(tok) ? new RegExp('('+tok.replace(':','\\:')+')','g') : new RegExp('\\b('+tok+')\\b','gi');
+    safe = safe.replace(re, '<span class="hl">$1</span>');
+  });
+  return safe;
+}
+
+/* ---------- discernment engine (local, no network) ---------- */
+function generateDiscernment(m){
+  const dn = S.user.divineName;
+  const name = S.user.soulName || 'Friend';
+  const season = S.user.season ? seasonLabel(S.user.season) : null;
+  const symNames = m.symbols.map(k=>SYMBOLS[k].name);
+  const parts = [];
+  if(m.type==='dream'){
+    parts.push(`${name}, dreams speak in a grammar older than words.`);
+  } else {
+    parts.push(`${name}, thank you for pausing long enough to notice.`);
+  }
+  if(symNames.length===1){
+    parts.push(`The ${symNames[0].toLowerCase()} stands out here. ${SYMBOLS[m.symbols[0]].meaning}`);
+  } else if(symNames.length>1){
+    const first=m.symbols[0], second=m.symbols[1];
+    parts.push(`Two threads are weaving together: the ${SYMBOLS[first].name.toLowerCase()} and the ${SYMBOLS[second].name.toLowerCase()}. ${SYMBOLS[first].meaning} Held beside that, the ${SYMBOLS[second].name.toLowerCase()} speaks of this: ${SYMBOLS[second].meaning.charAt(0).toLowerCase()+SYMBOLS[second].meaning.slice(1)}`);
+  } else {
+    parts.push(`No classic symbols surfaced this time, and that matters too. Sometimes the message is the feeling itself, delivered without costume.`);
+  }
+  if(m.emotion==='Awe') parts.push(`The awe you felt is not decoration. It is data. Something in you recognized something true.`);
+  if(m.emotion==='Anxiety') parts.push(`Notice the anxiety without obeying it. Fear and calling often arrive in the same envelope.`);
+  if(m.emotion==='Sadness') parts.push(`The sadness deserves a seat at the table, not a verdict. Grief is love with nowhere obvious to go.`);
+  if(m.emotion==='Peace') parts.push(`That peace is worth memorizing. Let your body learn its address so you can find your way back.`);
+  if(m.emotion==='Joy') parts.push(`Joy like this is not frivolous. It is evidence.`);
+  if(m.clairs.length){
+    const g = m.clairs[0];
+    parts.push(`You sensed this through ${giftLabel(g)}. That channel keeps showing up for you. Trust it a little more each time.`);
+  }
+  if(season) parts.push(`All of this lands inside ${season}, the season you named, and that colors everything. Be patient with the timeline.`);
+  parts.push(`Selah. Sit with it before you rush to interpret. ${dn} is not in a hurry, and neither is the truth.`);
+  const questions = [];
+  const qPool = [
+    m.symbols[0] ? `If the ${SYMBOLS[m.symbols[0]].name.toLowerCase()} could speak one sentence to you, what would it say?` : `What is the one sentence this moment is trying to say to you?`,
+    m.emotion ? `Where in your body did the ${m.emotion.toLowerCase()} live, and what does that place usually protect?` : `What did your body know before your mind caught up?`,
+    season ? `How does this land differently because you are in ${season} right now?` : `What would change if you trusted this was meant for you?`,
+    `What small, concrete act would honor this message within the next day?`
+  ];
+  for(const q of qPool){ if(questions.length<3) questions.push(q); }
+  return { reflection: parts.join(' '), questions };
+}
+function canDiscern(){
+  const k = todayKey();
+  if(S.discernsToday.date !== k){ S.discernsToday = {date:k, count:0}; }
+  return true; /* testing phase: unlimited for everyone */
+}
+
+/* ---------- seed pulse data ---------- */
+const SEED_PULSE = [
+  {id:'p1', name:'Aaliyah Grace', where:'Kenya', cat:'Healing', kind:'intention', text:'Lifting up my grandmother who is walking through a hard season. Asking for wisdom for those caring for her.', acts:212},
+  {id:'p2', name:'Mateo Rivera', where:'Mexico City', cat:'Clarity', kind:'intention', text:'Searching for the right path in my career transition. Seeking a peace that goes deeper than circumstances.', acts:147},
+  {id:'p3', name:'Chen Wei', where:'Singapore', cat:'Victory', kind:'victory', text:'Found my lost son today after three days of searching. Thank you to everyone who held us in light. The strength of this community is real.', acts:894},
+  {id:'p4', name:'Imani Okafor', where:'Lagos', cat:'Provision', kind:'victory', text:'The contract came through this morning, right when the account hit empty. Grateful beyond words.', acts:301},
+  {id:'p5', name:'Sarah Kim', where:'Seoul', cat:'Peace', kind:'intention', text:'Sitting with a big decision about family. Holding space for a soft heart and a clear mind.', acts:88}
+];
+if(!S.pulse.length){ S.pulse = SEED_PULSE.slice(); save(); }
+</script>
+<script>
+/* ================= RENDER CORE ================= */
+const app = document.getElementById('app');
+let vaultOpen = false;
+let route = 'home';
+
+function appHeader(title, accent, sub){
+  return `<header class="app-header">
+    <div class="brand">
+      <img src="${LOGO}" alt="Selah">
+      <div><div class="b-title">${title} ${accent?`<span class="accent-p">${accent}</span>`:''}</div>
+      <div class="b-sub">${sub||'PAUSE • REFLECT • DISCERN'}</div></div>
+    </div>
+    <button class="avatar-btn" onclick="go('soul')">${initialOf()}</button>
+  </header>`;
+}
+function navBar(active){
+  const items = [
+    ['home','grid_view','Home'],['space','self_improvement','Rituals'],
+    ['FAB'],['pulse','radio_button_checked','Together'],['soul','person','Profile']
+  ];
+  return `<nav id="bottom-nav" class="visible">` + items.map(it=>{
+    if(it[0]==='FAB') return `<button class="fab" onclick="go('journal')" aria-label="New Selah Moment"><span class="material-symbols-outlined" style="font-size:32px">add</span></button>`;
+    const on = active===it[0] ? 'on':'';
+    return `<button class="nav-btn ${on}" onclick="go('${it[0]}')"><span class="material-symbols-outlined ${on?'ms-fill':''}">${it[1]}</span><span class="lbl">${it[2]}</span></button>`;
+  }).join('') + `</nav>`;
+}
+function go(r, arg){
+  route = r;
+  vaultOpenGuard(r);
+  window.scrollTo(0,0);
+  render(arg);
+}
+function vaultOpenGuard(r){ if(r!=='vault' && r!=='vaultlist') vaultOpen=false; }
+function render(arg){
+  document.body.classList.toggle('calm', !!S.calm);
+  if(!S.auth){ app.innerHTML = viewAuth(); wireAuth(); return; }
+  if(!S.onboarded){ app.innerHTML = viewOnboarding(); wireOnboarding(); return; }
+  const views = {home:viewHome, journal:viewJournal, space:viewSpace, library:viewLibrary,
+    pulse:viewPulse, soul:viewSoul, petitions:viewPetitions, victories:viewVictories,
+    ritual:viewRitualLog, vault:viewVaultPin, vaultlist:viewVaultList, moments:viewMoments};
+  const fn = views[route] || viewHome;
+  app.innerHTML = fn(arg);
+  const wires = {journal:wireJournal, vault:wireVaultPin, ritual:wireRitual, library:wireLibrary};
+  if(wires[route]) wires[route](arg);
+}
+
+/* ================= AUTH ================= */
+let authMethod = 'email', authStage = 'enter', authContact = '', authCode = '';
+function viewAuth(){
+  if(authStage==='code'){
+    return `<div class="auth-wrap">
+      <img class="auth-logo" src="${LOGO}" alt="Selah" style="width:110px;height:110px">
+      <h2 style="font-size:26px;font-weight:700;margin-top:28px">Check your ${authMethod==='email'?'inbox':'messages'}</h2>
+      <p style="color:var(--ink-50);font-size:14px;margin-top:10px;text-align:center;line-height:1.6">We sent a 6-digit code to<br><b style="color:#fff">${esc(authContact)}</b></p>
+      <div class="otp-row" id="otp">${[0,1,2,3,4,5].map(i=>`<input inputmode="numeric" maxlength="1" data-i="${i}">`).join('')}</div>
+      <button class="grad-btn" id="verify-btn" style="max-width:340px">Sign in <span class="material-symbols-outlined ms-fill" style="font-size:20px">star</span></button>
+      ${window.BK && BK.on ? '' : '<div class="demo-note" style="max-width:340px">Local mode: your code is <b id="demo-code">'+authCode+'</b>.</div>'}
+      <button style="background:none;border:none;color:var(--ink-40);margin-top:22px;cursor:pointer;font-size:13px" onclick="authStage='enter';render()">Use a different ${authMethod==='email'?'address':'number'}</button>
+    </div>`;
+  }
+  return `<div class="auth-wrap">
+    <img class="auth-logo" src="${LOGO}" alt="Selah logo">
+    <div style="text-align:center;margin-bottom:34px">
+      <div class="auth-name"><span>Se</span><span class="lah">lah</span></div>
+      <p class="tagline" style="margin-top:10px">PAUSE • REFLECT • DISCERN</p>
+    </div>
+    <div style="width:100%;max-width:360px">
+      <div class="method-toggle">
+        <button class="${authMethod==='email'?'on':''}" onclick="authMethod='email';render()"><span class="material-symbols-outlined" style="font-size:18px">alternate_email</span>Email</button>
+        <button class="${authMethod==='phone'?'on':''}" onclick="authMethod='phone';render()"><span class="material-symbols-outlined" style="font-size:18px">smartphone</span>Phone</button>
+      </div>
+      <div class="field-card">
+        <label class="field-label" style="margin-bottom:2px">${authMethod==='email'?'Email':'Phone'}</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="material-symbols-outlined" style="color:rgba(43,238,227,.7);font-size:20px">${authMethod==='email'?'alternate_email':'smartphone'}</span>
+          <input id="contact-input" type="${authMethod==='email'?'email':'tel'}" placeholder="${authMethod==='email'?'your@essence.com':'+1 (555) 777 0777'}" value="${esc(authContact)}">
+        </div>
+      </div>
+      <button class="grad-btn" id="send-btn" style="margin-top:18px;height:60px;font-size:15px;text-transform:none;letter-spacing:0">Send me a code <span class="material-symbols-outlined ms-fill" style="font-size:20px">star</span></button>
+      <div class="demo-note">${window.BK && BK.on ? 'We will send a one time code to sign you in. No passwords, ever.' : 'Local mode: backend not configured yet (see config.js). Sign in stays on this device.'}</div>
+    </div>
+    <div style="margin-top:auto;padding-top:34px"><span style="color:var(--ink-40);font-size:13px">First time here? Signing in creates your space. </span></div>
+  </div>`;
+}
+function wireAuth(){
+  const send = document.getElementById('send-btn');
+  if(send){
+    const input = document.getElementById('contact-input');
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') send.click(); });
+    send.onclick = async ()=>{
+      const v = input.value.trim();
+      if(authMethod==='email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ toast('That email address needs another look.'); return; }
+      if(authMethod==='phone' && v.replace(/\D/g,'').length < 7){ toast('That phone number looks too short.'); return; }
+      authContact = v;
+      if(window.BK && BK.on){
+        send.disabled = true; send.textContent = 'Sending your code…';
+        try{
+          await BK.sendOtp(authMethod, v);
+          authCode = null; authStage = 'code'; render();
+        }catch(e){
+          send.disabled = false; render();
+          toast(BK.friendly(e, 'The code could not be sent. Check the address and try again.'));
+        }
+        return;
+      }
+      authCode = String(Math.floor(100000 + Math.random()*900000));
+      authStage = 'code';
+      render();
+    };
+  }
+  const otp = document.getElementById('otp');
+  if(otp){
+    const inputs = [...otp.querySelectorAll('input')];
+    inputs[0].focus();
+    inputs.forEach((inp,i)=>{
+      inp.addEventListener('input', ()=>{ inp.value=inp.value.replace(/\D/g,'').slice(0,1); if(inp.value && i<5) inputs[i+1].focus(); });
+      inp.addEventListener('keydown', e=>{ if(e.key==='Backspace' && !inp.value && i>0) inputs[i-1].focus(); });
+      inp.addEventListener('paste', e=>{ e.preventDefault(); const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6); t.split('').forEach((c,j)=>{ if(inputs[j]) inputs[j].value=c; }); if(t.length===6) inputs[5].focus(); });
+    });
+    const vbtn = document.getElementById('verify-btn');
+    vbtn.onclick = async ()=>{
+      const entered = inputs.map(x=>x.value).join('');
+      if(entered.length < 6){ toast('Enter all six digits of your code.'); return; }
+      if(window.BK && BK.on){
+        vbtn.disabled = true;
+        try{
+          await BK.verifyOtp(authMethod, authContact, entered);
+          S.auth = {method:authMethod, contact:authContact, at:new Date().toISOString()};
+          await BK.pullState();
+          save(); render();
+        }catch(e){
+          vbtn.disabled = false;
+          toast(BK.friendly(e, 'That code does not match, or it expired. Request a fresh one.'));
+        }
+        return;
+      }
+      if(entered !== authCode){ toast('That code does not match. Check the one shown below.'); return; }
+      S.auth = {method:authMethod, contact:authContact, at:new Date().toISOString()};
+      save(); render();
+    };
+  }
+}
+
+/* ================= ONBOARDING ================= */
+let obStep = 0;
+const OB = {
+  lenses:[], customLens:'', explorer:false, soulName:'', divineName:'The Divine', divineCustom:'',
+  holyBook:'auto', holyBookCustom:'',
+  comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
+  gifts:[], relational:'', season:'', processing:[]
+};
+const COMFORT_CATS = [
+  ['scripture','Scripture and Sacred Text','menu_book'],
+  ['crystals','Crystals and Energy Work','diamond'],
+  ['astrology','Astrology and Moon Cycles','dark_mode'],
+  ['ancestral','Ancestral Practices','diversity_1'],
+  ['divination','Divination and Signs','style'],
+  ['ritual','Ritual and Ceremony','local_fire_department']
+];
+function obShell(inner, canNext, nextLabel){
+  return `<div class="px" style="padding-top:26px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="${LOGO}" style="width:34px;height:34px;border-radius:50%" alt="">
+      <span class="eyebrow">Getting to know you · Step ${obStep+1} of 7</span>
+    </div>
+    <div class="ob-progress">${[0,1,2,3,4,5,6].map(i=>`<i class="${i<=obStep?'done':''}"></i>`).join('')}</div>
+    ${inner}
+    <div style="display:flex;gap:12px;margin-top:26px;padding-bottom:50px">
+      ${obStep>0?`<button class="ghost-btn" style="width:110px" onclick="obStep--;render()">Back</button>`:''}
+      <button class="grad-btn" id="ob-next" ${canNext?'':'disabled'}>${nextLabel||'Continue'}</button>
+    </div>
+  </div>`;
+}
+function obPrimaryLens(){ return OB.lenses[0] || 'Universal'; }
+function viewOnboarding(){
+  const u = OB;
+  if(obStep===0){
+    return obShell(`
+      <h1 class="screen-title" style="margin-bottom:6px">Welcome</h1>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:24px">Selah adapts to you: your language, your traditions, your comfort level. A few questions get that right. There are no wrong answers, and you can change any of this later.</p>
+      <label class="field-label">What should we call you?</label>
+      <input id="ob-name" placeholder="Your name" value="${esc(u.soulName)}" style="margin-bottom:20px">
+      <label class="field-label">What do you call the sacred?</label>
+      <div id="ob-divine">${DIVINE_NAMES.map(d=>`<button class="opt-card ${u.divineName===d && !u.divineCustom?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span>${d}</button>`).join('')}</div>
+      <input id="ob-divine-custom" placeholder="Or write your own…" value="${esc(u.divineCustom)}" style="margin-top:6px">
+    `, !!u.soulName.trim());
+  }
+  if(obStep===1){
+    return obShell(`
+      <h1 class="screen-title" style="margin-bottom:6px">Your traditions</h1>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Which traditions feel like home? Choose as many as fit. The first one you pick becomes the main language Selah uses with you.</p>
+      <div id="ob-lens">${LENSES.map(l=>{const i=u.lenses.indexOf(l);return `<button class="opt-card ${i>-1?'on':''}" data-v="${l}"><span class="material-symbols-outlined">auto_awesome</span><span style="flex:1">${l}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
+      <input id="ob-lens-custom" placeholder="Something else? Say it in your own words…" value="${esc(u.customLens)}" style="margin-top:6px;margin-bottom:14px">
+      <label class="field-label" style="margin-top:6px">Which sacred text do you read? <span style="color:var(--ink-30);text-transform:none;letter-spacing:0">(optional)</span></label>
+      <select id="ob-book" style="margin-bottom:8px">
+        <option value="auto" ${u.holyBook==='auto'?'selected':''}>Match my tradition</option>
+        ${HOLY_BOOKS.map(b=>`<option value="${b}" ${u.holyBook===b?'selected':''}>${b}</option>`).join('')}
+      </select>
+      <input id="ob-book-custom" placeholder="A different one? Name it…" value="${esc(u.holyBookCustom)}" style="margin-bottom:14px">
+      <button class="opt-card ${u.explorer?'on':''}" id="ob-explorer"><span class="material-symbols-outlined">explore</span>I like exploring<small>Show me language and ideas from other traditions alongside my own</small></button>
+    `, u.lenses.length>0 || !!u.customLens.trim());
+  }
+  if(obStep===2){
+    return obShell(`
+      <h1 class="screen-title" style="margin-bottom:6px">Your comfort level</h1>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:22px">How at home are you with each of these, from 1 (keep it out of sight) to 5 (fully at home)? Selah shows or tucks away content to match.</p>
+      ${COMFORT_CATS.map(([k,name,icon])=>`
+        <div class="comfort-row">
+          <div class="cr-head"><span class="cr-name"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;color:var(--ink-40)">${icon}</span> ${name}</span><span class="cr-val" id="cv-${k}">${u.comfort[k]}/5</span></div>
+          <div class="dots" data-k="${k}">${[1,2,3,4,5].map(n=>`<button class="${u.comfort[k]>=n?'on':''}" data-n="${n}">${n}</button>`).join('')}</div>
+        </div>`).join('')}
+    `, true);
+  }
+  if(obStep===3){
+    const lens = obPrimaryLens();
+    return obShell(`
+      <h1 class="screen-title" style="margin-bottom:6px">How insight reaches you</h1>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">People sense things in different ways. Choose every one that resonates; skip any that do not. Each card explains what it means.</p>
+      <div id="ob-gifts">${CLAIRS.map(c=>{const lbl=giftLabel(c.k, lens);const info=CLAIR_INFO[c.k];return `<button class="opt-card ${u.gifts.includes(c.k)?'on':''}" data-v="${c.k}"><span class="material-symbols-outlined">${c.icon}</span><span style="flex:1">${lbl}<small>${info.desc}<br><span style="color:rgba(43,238,227,.6)">Also called: ${info.syn}${lbl!==c.k?', '+c.k.toLowerCase():''}</span></small></span></button>`;}).join('')}</div>
+    `, true, u.gifts.length? 'Continue' : 'Skip for now');
+  }
+  if(obStep===4){
+    return obShell(`
+      <h1 class="screen-title" style="margin-bottom:6px">Who walks with you?</h1>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">This shapes what Selah suggests.</p>
+      <div id="ob-rel">
+        <button class="opt-card ${u.relational==='Solitary'?'on':''}" data-v="Solitary"><span class="material-symbols-outlined">person</span>Mostly on my own<small>My practice is mine alone</small></button>
+        <button class="opt-card ${u.relational==='Small Circle'?'on':''}" data-v="Small Circle"><span class="material-symbols-outlined">group</span>A few trusted people<small>A small circle walks with me</small></button>
+        <button class="opt-card ${u.relational==='Community'?'on':''}" data-v="Community"><span class="material-symbols-outlined">groups</span>A community<small>I draw strength from the group</small></button>
+      </div>
+    `, !!u.relational);
+  }
+  if(obStep===5){
+    const lens = obPrimaryLens();
+    return obShell(`
+      <h1 class="screen-title" style="margin-bottom:6px">Your current season</h1>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Where does this chapter of your life find you?</p>
+      <div id="ob-season">${SEASONS.map(s=>{const lbl=SEASONS_MAP[s][lens]||s;return `<button class="opt-card ${u.season===s?'on':''}" data-v="${s}"><span class="material-symbols-outlined">partly_cloudy_night</span>${lbl}${lbl!==s?`<small>${s}</small>`:''}</button>`;}).join('')}</div>
+    `, !!u.season);
+  }
+  return obShell(`
+    <h1 class="screen-title" style="margin-bottom:6px">How do you process?</h1>
+    <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">Choose every way that works for you.</p>
+    <div id="ob-proc">
+      ${[['Writing','edit_note','Words on the page untangle me'],['Speaking','mic','I think out loud'],['Visual','palette','Images before words'],['Stillness','self_improvement','Silence does the work']].map(([k,icon,sub])=>`
+      <button class="opt-card ${OB.processing.includes(k)?'on':''}" data-v="${k}"><span class="material-symbols-outlined">${icon}</span>${k}<small>${sub}</small></button>`).join('')}
+    </div>
+  `, OB.processing.length>0, 'Finish and come in');
+}
+function wireOnboarding(){
+  const next = document.getElementById('ob-next');
+  const bindText = (id, set)=>{ const el=document.getElementById(id); if(el) el.addEventListener('input', ()=>set(el.value)); };
+  bindText('ob-name', v=>{ OB.soulName=v; next.disabled=!v.trim(); });
+  bindText('ob-divine-custom', v=>{ OB.divineCustom=v; });
+  bindText('ob-lens-custom', v=>{ OB.customLens=v; if(v.trim()) next.disabled=false; else next.disabled = OB.lenses.length===0; });
+  bindText('ob-book-custom', v=>{ OB.holyBookCustom=v; });
+  const bookSel = document.getElementById('ob-book');
+  if(bookSel) bookSel.addEventListener('change', ()=>{ OB.holyBook=bookSel.value; });
+  const pickOne = (id, set)=>{ const el=document.getElementById(id); if(!el) return;
+    el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{ set(b.dataset.v); render(); }); };
+  pickOne('ob-divine', v=>{ OB.divineName=v; OB.divineCustom=''; });
+  pickOne('ob-rel', v=>OB.relational=v);
+  pickOne('ob-season', v=>OB.season=v);
+  const pickMany = (id, arr)=>{ const el=document.getElementById(id); if(!el) return;
+    el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{
+      const v=b.dataset.v; const i=arr.indexOf(v);
+      if(i>-1) arr.splice(i,1); else arr.push(v);
+      render();
+    }); };
+  pickMany('ob-lens', OB.lenses);
+  pickMany('ob-gifts', OB.gifts);
+  pickMany('ob-proc', OB.processing);
+  const exp = document.getElementById('ob-explorer');
+  if(exp) exp.onclick = ()=>{ OB.explorer=!OB.explorer; render(); };
+  document.querySelectorAll('.dots').forEach(row=>{
+    row.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+      OB.comfort[row.dataset.k] = +b.dataset.n; render();
+    });
+  });
+  if(next) next.onclick = ()=>{
+    if(next.disabled) return;
+    if(obStep < 6){ obStep++; render(); return; }
+    S.user = {...S.user,
+      soulName: OB.soulName.trim(),
+      divineName: OB.divineCustom.trim() || OB.divineName,
+      lens: obPrimaryLens(),
+      lenses: OB.lenses.length ? OB.lenses.slice() : ['Universal'],
+      customLens: OB.customLens.trim(),
+      holyBook: OB.holyBook, holyBookCustom: OB.holyBookCustom.trim(),
+      explorer: OB.explorer, comfort: OB.comfort, gifts: OB.gifts.slice(),
+      relational: OB.relational, season: OB.season, processing: OB.processing.slice()
+    };
+    S.onboarded = true; markStreak(); save();
+    route='home'; render();
+    setTimeout(()=>toast(`Welcome, ${esc(S.user.soulName)}. It is all set up for you.`), 400);
+  };
+}
+</script>
+<script>
+/* ================= HOME ================= */
+function clairFreq(){
+  const days = {}; const now = new Date();
+  const counts = [];
+  for(let i=6;i>=0;i--){ const d=new Date(now); d.setDate(d.getDate()-i); counts.push({key:todayKey(d), label:d.toLocaleDateString(undefined,{weekday:'narrow'}), n:0}); }
+  S.moments.forEach(m=>{ const k=todayKey(new Date(m.createdAt)); const c=counts.find(x=>x.key===k); if(c) c.n += 1 + m.clairs.length; });
+  return counts;
+}
+function topClair(){
+  const tally={};
+  S.moments.forEach(m=>m.clairs.forEach(c=>tally[c]=(tally[c]||0)+1));
+  const top = Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
+  return top ? top[0] : null;
+}
+function alignScore(){
+  const week = clairFreq().reduce((a,c)=>a+c.n,0);
+  return Math.min(98, 40 + week*6 + streakCount()*3);
+}
+function viewHome(){
+  const hour = new Date().getHours();
+  const greet = hour<5?'Up early, or up late?':hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+  const week = (()=>{ const out=[]; const now=new Date();
+    for(let i=6;i>=0;i--){ const d=new Date(now); d.setDate(d.getDate()-i);
+      out.push({label:d.toLocaleDateString(undefined,{weekday:'narrow'}), num:d.getDate(), hit:S.streak.includes(todayKey(d))}); }
+    return out; })();
+  const last = S.moments.filter(m=>!m.vault)[0];
+  const tc = topClair();
+  const freq = clairFreq(); const maxN = Math.max(1,...freq.map(f=>f.n));
+  const victories = S.petitions.filter(p=>p.answered).length;
+  const active = S.petitions.filter(p=>!p.answered).length;
+  const txt = dailyText();
+  const align = alignScore();
+  return appHeader('Selah','Home') + `<main class="px" style="padding-top:20px">
+    <div class="section">
+      <p class="eyebrow" style="margin-bottom:4px">${greet}</p>
+      <h1 style="font-size:26px;font-weight:700">${esc(S.user.soulName)}</h1>
+      ${S.user.season?`<span class="chip purple" style="margin-top:10px">${esc(seasonLabel(S.user.season))}</span>`:''}
+    </div>
+
+    <section class="section glass card" style="border-radius:32px">
+      <div class="section-head" style="margin-bottom:18px">
+        <span style="font-size:14px;font-weight:700">Your <span class="accent-p">Streak</span></span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700">${streakCount()} Day <span class="material-symbols-outlined accent-p" style="font-size:16px">local_fire_department</span></span>
+      </div>
+      <div class="streak-row">${week.map(w=>`<div class="streak-day ${w.hit?'hit':''}"><span class="d">${w.label}</span><span class="n">${w.num}</span></div>`).join('')}</div>
+    </section>
+
+    <section class="section">
+      <button class="grad-btn" style="height:62px;font-size:16px;text-transform:none;letter-spacing:.02em" onclick="go('journal')">
+        <span class="material-symbols-outlined" style="font-size:24px">flare</span> Begin a Selah Moment
+      </button>
+    </section>
+
+    <section class="section glass card" style="border-radius:32px;border-color:rgba(173,43,238,.25)">
+      <div class="section-head">
+        <div><div style="font-size:14px;font-weight:700;margin-bottom:6px">Your Clarity</div>
+        <span class="chip"><i style="width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal)"></i>${align>75?'In a strong rhythm':align>55?'Finding your rhythm':'Easing back in'}</span></div>
+        <div style="text-align:right"><div style="font-size:26px;font-weight:700">${align}%</div><div class="eyebrow" style="font-size:8px">Clarity level</div></div>
+      </div>
+      <div class="bars">${freq.map(f=>`<div class="bar-col"><div class="bar" style="height:${Math.round(f.n/maxN*100)}%;${f.n===0?'opacity:.15':''}"></div><span class="d">${f.label}</span></div>`).join('')}</div>
+      ${tc?`<div style="margin-top:14px;display:flex;align-items:center;gap:8px"><span class="chip">Top gift</span><span style="font-size:12px;color:var(--ink-70)">${esc(giftLabel(tc))}</span></div>`:''}
+    </section>
+
+    ${last?`<section class="section">
+      <div class="section-head"><span class="eyebrow">Latest Moment</span><button class="icon-mini" onclick="go('moments')" aria-label="All moments"><span class="material-symbols-outlined" style="font-size:17px">arrow_forward</span></button></div>
+      <div class="glass card" style="border-radius:28px;border-color:rgba(43,238,227,.2)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:42px;height:42px;border-radius:14px;background:rgba(43,238,227,.1);border:1px solid rgba(43,238,227,.3);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined accent-t">${last.type==='dream'?'bedtime':'flare'}</span></div>
+          <div><div style="font-size:14px;font-weight:700">${last.type==='dream'?'Dream Log':'Waking Moment'}</div><div style="font-size:10px;color:rgba(43,238,227,.7);font-weight:600;text-transform:uppercase;letter-spacing:.08em">${fmtDate(last.createdAt)}</div></div>
+        </div>
+        <p style="font-size:14px;line-height:1.65;color:var(--ink-70);font-style:italic">"${highlightText(last.text.slice(0,220), last.symbols)}${last.text.length>220?'…':''}"</p>
+        ${last.symbols.length?`<div class="sym-found" style="margin-top:14px">${last.symbols.map(s=>`<span class="chip purple"><span class="material-symbols-outlined" style="font-size:12px">auto_fix_high</span>${esc(SYMBOLS[s].name)}</span>`).join('')}</div>`:''}
+      </div>
+    </section>`:''}
+
+    <section class="section" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;border-color:rgba(43,238,227,.3);background:var(--glass)" onclick="go('victories')">
+        <span class="material-symbols-outlined accent-t" style="margin-bottom:10px">verified</span>
+        <div class="eyebrow" style="color:rgba(43,238,227,.7);font-size:9px;margin-bottom:4px">${T('wall')}</div>
+        <div style="font-size:19px;font-weight:700;color:#fff">${victories} answered</div>
+      </button>
+      <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;border-color:rgba(173,43,238,.3);background:var(--glass)" onclick="go('petitions')">
+        <span class="material-symbols-outlined accent-p" style="margin-bottom:10px">waving_hand</span>
+        <div class="eyebrow" style="color:rgba(173,43,238,.8);font-size:9px;margin-bottom:4px">${T('activeShort')}</div>
+        <div style="font-size:19px;font-weight:700;color:#fff">${active} active</div>
+      </button>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><span class="eyebrow">Your Logs</span><button class="icon-mini" onclick="go('library')"><span class="material-symbols-outlined" style="font-size:17px">arrow_forward</span></button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;background:var(--glass)" onclick="go('moments','dream')">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(173,43,238,.1);border:1px solid rgba(173,43,238,.25);display:flex;align-items:center;justify-content:center;margin-bottom:24px"><span class="material-symbols-outlined accent-p">bedtime</span></div>
+          <div style="font-size:14px;font-weight:700;color:#fff">Dream Logs</div>
+          <div style="font-size:10px;color:var(--ink-40);margin-top:4px">${S.moments.filter(m=>m.type==='dream').length} logged</div>
+        </button>
+        <button class="glass card" style="border-radius:26px;text-align:left;cursor:pointer;background:var(--glass)" onclick="go('moments','waking')">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(43,238,227,.1);border:1px solid rgba(43,238,227,.25);display:flex;align-items:center;justify-content:center;margin-bottom:24px"><span class="material-symbols-outlined accent-t">eco</span></div>
+          <div style="font-size:14px;font-weight:700;color:#fff">Waking Moments</div>
+          <div style="font-size:10px;color:var(--ink-40);margin-top:4px">${S.moments.filter(m=>m.type==='waking').length} noticed</div>
+        </button>
+      </div>
+    </section>
+
+    <section class="section glass card" style="border-radius:30px;padding:30px;text-align:center;position:relative">
+      <span class="material-symbols-outlined" style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);color:rgba(173,43,238,.5);font-size:30px">flare</span>
+      <p class="serif-quote">"${esc(txt[0])}"</p>
+      <div class="divider-dot"></div>
+      <p class="eyebrow">${esc(txt[1])}</p>
+    </section>
+  </main>` + navBar('home');
+}
+
+/* ================= MOMENTS LIST ================= */
+function viewMoments(filter){
+  let list = S.moments.filter(m=>!m.vault);
+  if(filter==='dream') list = list.filter(m=>m.type==='dream');
+  if(filter==='waking') list = list.filter(m=>m.type==='waking');
+  return appHeader('Your','Journal') + `<main class="px" style="padding-top:20px">
+    <div class="section-head">
+      <h1 class="screen-title">${filter==='dream'?'Dream Logs':filter==='waking'?'Waking Moments':'All Moments'}</h1>
+      ${S.vaultPin!==null||S.moments.some(m=>m.vault)?`<button class="chip dim" style="cursor:pointer;border:1px solid var(--glass-border);background:rgba(255,255,255,.05)" onclick="go('vault')"><span class="material-symbols-outlined" style="font-size:13px">lock</span>Vault</button>`:''}
+    </div>
+    ${list.length===0?`<div class="glass card" style="border-radius:24px;text-align:center;padding:40px 24px;color:var(--ink-40);font-size:14px;line-height:1.6">Nothing here yet. Tap the star below to capture your first Selah Moment.</div>`:''}
+    ${list.map(m=>momentCard(m)).join('')}
+  </main>` + navBar('home');
+}
+function momentCard(m){
+  return `<div class="glass moment-card">
+    <div class="m-head">
+      <span class="chip ${m.type==='dream'?'purple':''}"><span class="material-symbols-outlined" style="font-size:12px">${m.type==='dream'?'bedtime':'flare'}</span>${m.type==='dream'?'Dream':'Waking'}</span>
+      <span style="font-size:10px;color:var(--ink-30);font-weight:600">${fmtDate(m.createdAt)}</span>
+    </div>
+    <p class="m-text">"${highlightText(m.text, m.symbols)}"</p>
+    ${m.emotion||m.clairs.length?`<div class="sym-found">${m.emotion?`<span class="chip dim">${esc(m.emotion)}</span>`:''}${m.clairs.map(c=>`<span class="chip">${esc(giftLabel(c))}</span>`).join('')}</div>`:''}
+    ${m.reflection?`<div class="insight-card" style="margin-top:14px;font-size:13px"><div class="eyebrow" style="color:var(--teal);margin-bottom:8px;font-size:9px"><span class="material-symbols-outlined" style="font-size:12px;vertical-align:-2px">auto_fix_high</span> Selah ${T('insight')}</div>${esc(m.reflection)}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
+      <button class="icon-mini" title="${m.vault?'Remove from vault':'Move to vault'}" onclick="toggleVault('${m.id}')"><span class="material-symbols-outlined" style="font-size:17px">${m.vault?'lock_open':'lock'}</span></button>
+      <button class="icon-mini" title="Delete" onclick="delMoment('${m.id}')"><span class="material-symbols-outlined" style="font-size:17px">delete</span></button>
+    </div>
+  </div>`;
+}
+function toggleVault(id){
+  const m = S.moments.find(x=>x.id===id); if(!m) return;
+  if(!m.vault && S.vaultPin===null){ toast('Set a vault PIN first.'); go('vault'); return; }
+  m.vault = !m.vault; save(); render();
+  toast(m.vault?'Moved to your private vault.':'Back in your open journal.');
+}
+function delMoment(id){
+  if(!confirmAsk('Delete this entry? It cannot be recovered.')) return;
+  S.moments = S.moments.filter(x=>x.id!==id); save(); render();
+}
+function confirmAsk(msg){ return window.confirm(msg); }
+
+/* ================= JOURNAL CANVAS ================= */
+let J = null;
+function resetJ(){ J = {type:'waking', emotion:null, clairs:[], text:'', symbols:[], reflection:null, questions:[]}; }
+function viewJournal(){
+  if(!J) resetJ();
+  return `<header class="app-header">
+    <div class="brand"><img src="${LOGO}" alt="Selah"><div><div class="b-title">Journal <span class="accent-p">Canvas</span></div><div class="b-sub">Capture the stream</div></div></div>
+    <button class="icon-mini" style="width:40px;height:40px" onclick="resetJ();go('home')"><span class="material-symbols-outlined">close</span></button>
+  </header>
+  <main class="px" style="padding-top:20px">
+    <div class="section seg">
+      <button class="${J.type==='waking'?'on':''}" onclick="J.type='waking';render()"><span class="material-symbols-outlined" style="font-size:16px">flare</span>Waking Moment</button>
+      <button class="${J.type==='dream'?'on':''}" onclick="J.type='dream';render()"><span class="material-symbols-outlined" style="font-size:16px">bedtime</span>Dream Log</button>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">How it felt</span><span style="font-size:10px;color:rgba(173,43,238,.8);font-weight:600">tap one</span></div>
+      <div class="emo-row">${EMOTIONS.map(e=>`<button class="emo ${J.emotion===e.k?'on':''}" onclick="J.emotion=J.emotion==='${e.k}'?null:'${e.k}';render()"><span class="ic"><span class="material-symbols-outlined">${e.icon}</span></span><span class="lbl">${e.k}</span></button>`).join('')}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">${T('senses')}</span><button class="icon-mini" style="width:26px;height:26px" onclick="openClairInfo()" title="What do these mean?"><span class="material-symbols-outlined" style="font-size:15px">info</span></button></div>
+      <div class="clair-grid">${CLAIRS.map(c=>`<button class="clair ${J.clairs.includes(c.k)?'on':''}" data-clair="${c.k}"><span class="ic"><span class="material-symbols-outlined" style="font-size:20px">${c.icon}</span></span><span class="lbl">${giftLabel(c.k)}</span></button>`).join('')}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">What happened</span><span class="chip" id="sym-count" style="${J.symbols.length?'':'visibility:hidden'}"><span class="material-symbols-outlined" style="font-size:12px">verified</span>${J.symbols.length} symbol${J.symbols.length===1?'':'s'} found</span></div>
+      <textarea id="jr-text" class="jr-textarea" placeholder="${J.type==='dream'?'I just woke up. It was so vivid…':'Something just happened that I need to sit with…'}">${esc(J.text)}</textarea>
+      <div class="sym-found" id="sym-chips">${J.symbols.map(s=>`<span class="chip"><span class="material-symbols-outlined" style="font-size:12px">${SYMBOLS[s].icon}</span>${esc(SYMBOLS[s].name)}</span>`).join('')}</div>
+      <div id="crisis-slot" style="margin-top:14px">${J.crisis?crisisCard():''}</div>
+    </div>
+
+    ${J.reflection?`
+    <div class="section">
+      <div class="section-head"><span class="eyebrow" style="color:var(--teal)"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-3px">auto_fix_high</span> Selah ${T('insight')}</span></div>
+      <div class="insight-card">${esc(J.reflection)}</div>
+    </div>
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">${T('qTitle')}</span></div>
+      <div class="glass" style="border-radius:20px">${J.questions.map((q,i)=>`<div class="sq-item"><span class="num">0${i+1}</span><p>${esc(q)}</p></div>`).join('')}</div>
+    </div>`:''}
+
+    <div class="section" style="display:flex;flex-direction:column;gap:12px;padding-bottom:30px">
+      ${!J.reflection?`<button class="grad-btn" id="discern-btn" style="height:60px;font-size:16px;text-transform:none;letter-spacing:.01em"><span class="material-symbols-outlined">psychology</span>${T('discernCta')}</button>
+      <p style="text-align:center;font-size:10px;color:var(--ink-40);text-transform:uppercase;letter-spacing:.14em;font-style:italic">Unlimited ${T('discernNoun')}s · Pro included free during testing</p>`:''}
+      <button class="ghost-btn" id="save-moment" style="padding:16px;font-size:13px"><span class="material-symbols-outlined" style="font-size:18px">done_all</span>Save this Moment</button>
+    </div>
+  </main>`;
+}
+function crisisCard(){
+  return `<div class="crisis-card">
+    <b>You matter, and this sounds heavy.</b><br>
+    Selah is a journal, not a lifeline, and what you wrote deserves a human voice on the other end.
+    In the US, call or text <b>988</b> (Suicide and Crisis Lifeline) anytime, day or night.
+    If you are elsewhere, <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a> lists local support.
+    Your words here stay private on this device.
+  </div>`;
+}
+function wireJournal(){
+  const ta = document.getElementById('jr-text');
+  ta.addEventListener('input', ()=>{
+    J.text = ta.value;
+    J.symbols = detectSymbols(J.text);
+    J.crisis = CRISIS_RE.test(J.text);
+    const cnt = document.getElementById('sym-count');
+    cnt.style.visibility = J.symbols.length?'visible':'hidden';
+    cnt.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px">verified</span>${J.symbols.length} symbol${J.symbols.length===1?'':'s'} found`;
+    document.getElementById('sym-chips').innerHTML = J.symbols.map(s=>`<span class="chip"><span class="material-symbols-outlined" style="font-size:12px">${SYMBOLS[s].icon}</span>${esc(SYMBOLS[s].name)}</span>`).join('');
+    document.getElementById('crisis-slot').innerHTML = J.crisis?crisisCard():'';
+  });
+  document.querySelectorAll('[data-clair]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.clair;
+    J.clairs = J.clairs.includes(k) ? J.clairs.filter(x=>x!==k) : [...J.clairs,k];
+    render();
+  });
+  const db = document.getElementById('discern-btn');
+  if(db) db.onclick = async ()=>{
+    if(!J.text.trim()){ toast('Write or speak your stream first. Selah listens to what you notice.'); return; }
+    if(!canDiscern()){ openPaywall(); return; }
+    S.discernsToday.count++; save();
+    let out = null;
+    if(window.BK && BK.on && BK.session){
+      db.disabled = true;
+      db.innerHTML = '<span class="material-symbols-outlined">psychology</span>Selah is listening…';
+      try{ out = await BK.discern(J); }
+      catch(e){ console.warn(e); toast('The AI is quiet right now, so a built-in reflection stands in.'); }
+    }
+    if(!out) out = generateDiscernment(J);
+    J.reflection = out.reflection; J.questions = out.questions;
+    render(); window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
+  };
+  document.getElementById('save-moment').onclick = ()=>{
+    if(!J.text.trim()){ toast('Write a few words first.'); return; }
+    S.moments.unshift({ id:'m'+Date.now(), type:J.type, text:J.text, emotion:J.emotion,
+      clairs:J.clairs, symbols:J.symbols, reflection:J.reflection, questions:J.questions,
+      vault:false, createdAt:new Date().toISOString() });
+    markStreak(); save(); resetJ();
+    go('home'); toast('Saved. Selah.');
+  };
+}
+</script>
+<script>
+/* ================= SACRED SPACE ================= */
+const RITUAL_PATHS = [
+  {k:'Prayer', icon:'volunteer_activism', sub:'Communion with the Divine', cat:null},
+  {k:'Meditation', icon:'self_improvement', sub:'Stillness and presence', cat:null},
+  {k:'Scripture Reading', icon:'menu_book', sub:'Sacred wisdom', cat:'scripture'},
+  {k:'Fasting', icon:'timer', sub:'Sacrifice and focus', cat:'ritual'},
+  {k:'Spiritual Bath', icon:'bathtub', sub:'Purify the vessel', cat:'ritual'},
+  {k:'Sacred Consecration', icon:'local_fire_department', sub:'Divine separation', cat:'ritual'},
+  {k:'Ancestral Honoring', icon:'diversity_1', sub:'Remembering the line', cat:'ancestral'},
+  {k:'Crystal Work', icon:'diamond', sub:'Energy and intention', cat:'crystals'},
+  {k:'Moon Ceremony', icon:'dark_mode', sub:'Aligned with the cycle', cat:'astrology'},
+  {k:'Breathwork', icon:'air', sub:'Spirit in the breath', cat:null}
+];
+const TOOLS = [
+  {k:'White Sage', icon:'eco', cat:'ritual'},{k:'Amethyst', icon:'diamond', cat:'crystals'},
+  {k:'Palo Santo', icon:'local_fire_department', cat:'ritual'},{k:'Singing Bowl', icon:'notifications_active', cat:null},
+  {k:'Candle', icon:'candle', cat:null},{k:'Sacred Oil', icon:'water_drop', cat:'ritual'},
+  {k:'Prayer Beads', icon:'workspaces', cat:null},{k:'Journal', icon:'edit_note', cat:null}
+];
+function comfortable(cat){ return !cat || (S.user.comfort[cat]||3) >= 2; }
+function moonCSS(frac){
+  /* returns clip style for lit portion; simple approximation */
+  const lit = Math.round(Math.abs(Math.cos(Math.PI*frac))*100);
+  if(frac<=0.5){ return `clip-path: inset(0 0 0 ${100-Math.round(frac*2*100)}%);`; }
+  return `clip-path: inset(0 ${100-Math.round((1-frac)*2*100)}% 0 0);`;
+}
+function viewSpace(){
+  const mp = moonPhase(new Date());
+  const showMoon = comfortable('astrology');
+  const paths = RITUAL_PATHS.filter(p=>comfortable(p.cat));
+  const hiddenCount = RITUAL_PATHS.length - paths.length;
+  const ritualCount = S.rituals.length;
+  const txt = dailyText();
+  return appHeader('Sacred','Space') + `<main class="px" style="padding-top:20px">
+    ${showMoon?`<section class="section grad" style="border-radius:999px;padding:1px;box-shadow:0 0 24px rgba(173,43,238,.3)">
+      <div style="background:rgba(7,4,10,.92);border-radius:999px;padding:11px 22px;display:flex;align-items:center;justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined accent-t" style="font-size:20px">brightness_4</span><span class="eyebrow" style="color:rgba(255,255,255,.85);font-size:9px">Celestial Navigator</span></span>
+        <span class="eyebrow" style="color:var(--teal);font-size:9px">${mp.daysToNew===0?'New Moon tonight':mp.daysToNew+' days to New Moon'}</span>
+      </div>
+    </section>
+    <p style="text-align:center;margin-bottom:22px" class="tagline">PAUSE • REFLECT • DISCERN</p>
+    <section class="section" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="glass card" style="border-radius:24px;display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px">
+        <div class="moon-vis" style="margin-bottom:12px"><div class="moon-lit" style="${moonCSS(mp.frac)}"></div></div>
+        <span class="eyebrow" style="font-size:8px;margin-bottom:4px">Current Moon</span>
+        <div style="font-size:14px;font-weight:700">${mp.name}</div>
+        <div style="font-size:9px;color:rgba(43,238,227,.75);text-transform:uppercase;margin-top:5px;letter-spacing:.02em">${mp.hint}</div>
+      </div>
+      <div class="glass card" style="border-radius:24px;padding:18px;display:flex;flex-direction:column;justify-content:center">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="material-symbols-outlined" style="color:rgba(173,43,238,.6);font-size:18px">dark_mode</span><span class="eyebrow" style="font-size:8px">Moon Age</span></div>
+        <div style="font-size:14px;font-weight:700">Day ${Math.floor(mp.age)+1} of 30</div>
+        <div style="font-size:9px;color:var(--ink-40);margin-top:5px">of the lunar cycle</div>
+        <div style="height:5px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:12px;overflow:hidden"><div class="grad" style="height:100%;width:${Math.round(mp.frac*100)}%"></div></div>
+      </div>
+    </section>`:`<p style="text-align:center;margin-bottom:22px" class="tagline">PAUSE • REFLECT • DISCERN</p>`}
+
+    <section class="section glass card" style="border-radius:28px">
+      <div class="section-head" style="margin-bottom:8px"><span class="eyebrow">Your Practice</span><span style="font-size:12px;font-weight:700;color:var(--primary)">${ritualCount} logged</span></div>
+      <div style="height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden"><div class="grad" style="height:100%;width:${Math.min(100,ritualCount*10)}%"></div></div>
+      <button class="grad-btn" style="margin-top:16px;padding:14px" onclick="go('ritual')"><span class="material-symbols-outlined" style="font-size:18px">auto_fix_normal</span>${T('logRitual')}</button>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><span class="eyebrow"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-3px">explore</span> ${T('paths')}</span>${hiddenCount?`<span style="font-size:9px;color:var(--ink-30)">${hiddenCount} hidden by your comfort settings</span>`:''}</div>
+      ${paths.map(p=>`<button class="opt-card" onclick="startRitual('${p.k}')">
+        <span class="material-symbols-outlined" style="color:${['crystals','astrology'].includes(p.cat)?'var(--primary)':'rgba(43,238,227,.7)'}">${p.icon}</span>
+        <span><span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff">${p.k}</span><small>${p.sub}</small></span>
+        <span class="material-symbols-outlined" style="margin-left:auto;color:rgba(255,255,255,.2)">chevron_right</span>
+      </button>`).join('')}
+    </section>
+
+    <section class="section">
+      <div class="section-head"><span class="eyebrow"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-3px">auto_stories</span> Spiritual Library</span></div>
+      <button class="glass card" style="width:100%;border-radius:24px;cursor:pointer;display:flex;align-items:center;gap:16px;text-align:left" onclick="go('library')">
+        <div style="width:48px;height:48px;border-radius:16px;background:rgba(43,238,227,.1);border:1px solid rgba(43,238,227,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined accent-t">auto_stories</span></div>
+        <div><div style="font-size:14px;font-weight:700;color:#fff">Open the Library</div><div style="font-size:11px;color:var(--ink-40);margin-top:3px">Symbols, crystals, sacred oils, and scripture in your language</div></div>
+        <span class="material-symbols-outlined" style="margin-left:auto;color:rgba(255,255,255,.2)">chevron_right</span>
+      </button>
+    </section>
+
+    <section class="section glass card" style="border-radius:30px;padding:30px;text-align:center;position:relative;margin-bottom:40px">
+      <span class="material-symbols-outlined" style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);color:rgba(173,43,238,.5);font-size:30px">flare</span>
+      <p class="serif-quote">"${esc(txt[0])}"</p>
+      <div class="divider-dot"></div>
+      <p class="eyebrow">${esc(txt[1])}</p>
+    </section>
+  </main>` + navBar('space');
+}
+let R = null;
+function startRitual(type){ R = {type, tools:[], intention:'', notes:''}; go('ritual'); }
+function viewRitualLog(){
+  if(!R) R = {type:null, tools:[], intention:'', notes:''};
+  const tools = TOOLS.filter(t=>comfortable(t.cat));
+  const activePets = S.petitions.filter(p=>!p.answered);
+  return `<header class="app-header">
+    <div class="brand"><img src="${LOGO}" alt="Selah"><div><div class="b-title">Log a <span class="accent-t">Practice</span></div><div class="b-sub">What you did today</div></div></div>
+    <button class="icon-mini" style="width:40px;height:40px" onclick="R=null;go('space')"><span class="material-symbols-outlined">close</span></button>
+  </header>
+  <main class="px" style="padding-top:20px">
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">What did you practice?</span></div>
+      <div class="pill-row">${RITUAL_PATHS.filter(p=>comfortable(p.cat)).map(p=>`<button class="pill ${R.type===p.k?'on':''}" onclick="R.type='${p.k}';render()">${p.k}</button>`).join('')}</div>
+    </div>
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">What did you use?</span><span style="font-size:10px;color:var(--teal);font-weight:700">${R.tools.length} selected</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${tools.map(t=>`<button class="opt-card ${R.tools.includes(t.k)?'on':''}" style="margin-bottom:0" data-tool="${t.k}"><span class="material-symbols-outlined">${t.icon}</span><span style="font-size:13px;font-weight:700">${t.k}</span></button>`).join('')}
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">Connect a ${T('petitionOne')}</span></div>
+      ${activePets.length?`<select id="rit-int"><option value="">No link</option>${activePets.map(p=>`<option value="${p.id}" ${R.intention===p.id?'selected':''}>${esc(p.title)}</option>`).join('')}</select>`
+      :`<div class="glass card" style="border-radius:18px;font-size:12px;color:var(--ink-40);padding:16px">Nothing active yet. You can add one from the Home screen.</div>`}
+    </div>
+    <div class="section">
+      <div class="section-head"><span class="eyebrow">Notes and Observations</span></div>
+      <textarea id="rit-notes" style="min-height:110px;border-radius:20px" placeholder="Raw reflections, feelings, or insights during your ritual…">${esc(R.notes)}</textarea>
+    </div>
+    <div class="section" style="padding-bottom:40px">
+      <button class="grad-btn" id="seal-ritual" style="height:60px">Save this Practice <span class="material-symbols-outlined">done_all</span></button>
+    </div>
+  </main>`;
+}
+function wireRitual(){
+  document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.tool;
+    R.tools = R.tools.includes(k)?R.tools.filter(x=>x!==k):[...R.tools,k];
+    const sel=document.getElementById('rit-int'); if(sel) R.intention=sel.value;
+    const nt=document.getElementById('rit-notes'); if(nt) R.notes=nt.value;
+    render();
+  });
+  document.getElementById('seal-ritual').onclick = ()=>{
+    if(!R.type){ toast('Choose what you practiced first.'); return; }
+    const sel=document.getElementById('rit-int');
+    const nt=document.getElementById('rit-notes');
+    S.rituals.unshift({id:'r'+Date.now(), type:R.type, tools:R.tools, intention:sel?sel.value:'', notes:nt?nt.value:'', createdAt:new Date().toISOString()});
+    markStreak(); save(); R=null;
+    go('space'); toast('Saved. Good for you for showing up.');
+  };
+}
+
+/* ================= LIBRARY ================= */
+const LIB = {
+  Symbols: Object.entries(SYMBOLS).filter(([k])=>!/^\d|^11/.test(k)).map(([k,v])=>({key:'sym_'+k, name:v.name, icon:v.icon, meaning:v.meaning, cat:null})),
+  Numbers: Object.entries(SYMBOLS).filter(([k])=>/^\d|^11/.test(k)).map(([k,v])=>({key:'sym_'+k, name:v.name, icon:v.icon, meaning:v.meaning, cat:'divination'})),
+  Crystals: [
+    {key:'cr_amethyst', name:'Amethyst', icon:'diamond', meaning:'Spiritual protection and purification. Aids meditation and quiets the mind for higher discernment.', cat:'crystals'},
+    {key:'cr_quartz', name:'Clear Quartz', icon:'diamond', meaning:'The master amplifier. Clarifies intention and magnifies whatever you bring to it.', cat:'crystals'},
+    {key:'cr_rose', name:'Rose Quartz', icon:'favorite', meaning:'The heart stone. Softens grief, opens compassion for self and others.', cat:'crystals'},
+    {key:'cr_obsidian', name:'Black Obsidian', icon:'shield', meaning:'Grounding and psychic protection. A mirror for shadow work.', cat:'crystals'},
+    {key:'cr_selenite', name:'Selenite', icon:'flare', meaning:'Liquid light. Cleanses spaces and other stones. Connection to higher realms.', cat:'crystals'},
+    {key:'cr_citrine', name:'Citrine', icon:'wb_sunny', meaning:'Sunlight in stone form. Abundance, confidence, creative fire.', cat:'crystals'}
+  ],
+  'Sacred Oils': [
+    {key:'oil_frank', name:'Frankincense', icon:'water_drop', meaning:'The oil of prayer. Deepens meditation and consecrates sacred space. Gift of the wise.', cat:'ritual'},
+    {key:'oil_myrrh', name:'Myrrh', icon:'water_drop', meaning:'The oil of the threshold. Honors grief and transition, seals what is finished.', cat:'ritual'},
+    {key:'oil_lavender', name:'Lavender', icon:'spa', meaning:'Calm for the nervous system, peace for the night watch. An ally for dreamers.', cat:'ritual'},
+    {key:'oil_hyssop', name:'Hyssop', icon:'eco', meaning:'The purging herb of scripture. Cleansing, release, a fresh start.', cat:'scripture'},
+    {key:'oil_cedar', name:'Cedarwood', icon:'park', meaning:'Rootedness and strength. The scent of ancient temples and steady ground.', cat:'ritual'}
+  ],
+  Scripture: [
+    {key:'sc_ps46', name:'Psalm 46:10', book:'The Bible', icon:'menu_book', meaning:'"Be still, and know that I am God." The origin of the pause. Selah lives inside this verse.', cat:'scripture'},
+    {key:'sc_jn1', name:'John 1:5', book:'The Bible', icon:'menu_book', meaning:'"The light shines in the darkness, and the darkness has not overcome it." Persistence of hope.', cat:'scripture'},
+    {key:'sc_is30', name:'Isaiah 30:15', book:'The Bible', icon:'menu_book', meaning:'"In quietness and trust shall be your strength." Rest as a strategy, not a retreat.', cat:'scripture'},
+    {key:'sc_ps23', name:'Psalm 23:2-3', book:'The Bible', icon:'menu_book', meaning:'"He leads me beside still waters. He restores my soul." Restoration happens in the slow places.', cat:'scripture'},
+    {key:'sc_qr13', name:'Qur\u2019an 13:28', book:'The Qur\u2019an', icon:'menu_book', meaning:'"Verily, in the remembrance of God do hearts find rest." Stillness as homecoming.', cat:'scripture'},
+    {key:'sc_qr94', name:'Qur\u2019an 94:5-6', book:'The Qur\u2019an', icon:'menu_book', meaning:'"So truly, with hardship comes ease." Twice repeated, so the heart cannot miss it.', cat:'scripture'},
+    {key:'sc_qr24', name:'Qur\u2019an 24:35', book:'The Qur\u2019an', icon:'menu_book', meaning:'"God is the Light of the heavens and the earth." The Verse of Light.', cat:'scripture'},
+    {key:'sc_ps37', name:'Psalm 37:7', book:'The Tanakh', icon:'menu_book', meaning:'"Be still before the Lord and wait patiently." Patience as an act of trust.', cat:'scripture'},
+    {key:'sc_prov', name:'Proverbs 20:27', book:'The Tanakh', icon:'menu_book', meaning:'"The soul of man is the lamp of God." You carry the light you are searching for.', cat:'scripture'},
+    {key:'sc_micah', name:'Micah 6:8', book:'The Tanakh', icon:'menu_book', meaning:'"Act justly, love mercy, walk humbly." The whole path in nine words.', cat:'scripture'},
+    {key:'sc_gita2', name:'Bhagavad Gita 2:20', book:'The Bhagavad Gita', icon:'menu_book', meaning:'"The soul is neither born, and nor does it die." What is real in you cannot be threatened.', cat:'scripture'},
+    {key:'sc_gita', name:'Bhagavad Gita 6:19', book:'The Bhagavad Gita', icon:'menu_book', meaning:'"A lamp in a windless place does not flicker." The disciplined mind at rest in meditation.', cat:'scripture'},
+    {key:'sc_dham', name:'Dhammapada 1', book:'The Dhammapada', icon:'menu_book', meaning:'"All that we are is the result of what we have thought." The mind as the first mover.', cat:'scripture'},
+    {key:'sc_dham100', name:'Dhammapada 100', book:'The Dhammapada', icon:'menu_book', meaning:'"Better than a thousand hollow words is one word that brings peace." Quality over noise.', cat:'scripture'},
+    {key:'sc_rumi', name:'Rumi, Masnavi', book:'Sufi Poetry', icon:'menu_book', meaning:'"The wound is the place where the Light enters you." Suffering as a doorway, not a dead end.', cat:'scripture'},
+    {key:'sc_rumi2', name:'Rumi', book:'Sufi Poetry', icon:'menu_book', meaning:'"What you seek is seeking you." Longing as a two-way road.', cat:'scripture'}
+  ]
+};
+let libTab = 'Gifts', libQ = '';
+function viewLibrary(){
+  const tabs = ['Gifts'].concat(Object.keys(LIB));
+  const visible = t => LIB[t].length && (LIB[t][0].cat===null || LIB[t].some(x=>comfortable(x.cat)));
+  let items = libTab==='Gifts'
+    ? CLAIRS.map(c=>{const info=CLAIR_INFO[c.k];const lbl=giftLabel(c.k);return {key:'gift_'+c.k, name:lbl, icon:c.icon, cat:null,
+        meaning: info.desc+' Also called: '+info.syn+(lbl!==c.k?', '+c.k.toLowerCase():'')+'.'};})
+    : (LIB[libTab]||[]).filter(x=>comfortable(x.cat));
+  let bookNote = '';
+  if(libTab==='Scripture'){
+    const book = userBook();
+    if(BOOK_TEXTS[book] && book!=='A blend of many'){
+      const mine = items.filter(x=>x.book===book);
+      if(mine.length){ items = mine; bookNote = `Showing ${book} · change your sacred text in your profile`; }
+    } else if(S.user.holyBookCustom){
+      bookNote = `We do not have ${esc(S.user.holyBookCustom)} passages in the library yet, so all traditions are shown. More texts are coming.`;
+    }
+  }
+  if(libQ) items = items.filter(x=> (x.name+' '+x.meaning).toLowerCase().includes(libQ.toLowerCase()));
+  const lockedTab = (LIB[libTab]||[]).length && !items.length && !libQ;
+  return appHeader('Spiritual','Library') + `<main class="px" style="padding-top:18px">
+    <div class="section" style="position:relative">
+      <span class="material-symbols-outlined" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:19px">search</span>
+      <input id="lib-q" placeholder="Search symbols, crystals, scripture…" value="${esc(libQ)}" style="padding-left:46px;border-radius:16px">
+    </div>
+    <div class="section pill-row">${tabs.map(t=>`<button class="pill ${libTab===t?'on':''}" onclick="libTab='${t}';render()">${t}</button>`).join('')}</div>
+    ${bookNote?`<p style="font-size:11px;color:var(--ink-40);margin:-10px 2px 16px;line-height:1.5">${bookNote}</p>`:''}
+    ${lockedTab?`<div class="glass card" style="border-radius:22px;text-align:center;color:var(--ink-40);font-size:13px;line-height:1.6;padding:30px">This shelf is tucked away, based on your comfort settings.<br>You can open it anytime from your profile.</div>`:''}
+    ${!items.length && libQ ? `<div class="glass card" style="border-radius:22px;text-align:center;color:var(--ink-40);font-size:13px;padding:30px">Nothing matches "${esc(libQ)}" on this shelf.</div>`:''}
+    ${items.map(x=>{
+      const rev = S.revelations[x.key]||'';
+      return `<div class="glass lib-card">
+        <div class="lib-hero" style="background:linear-gradient(135deg, rgba(173,43,238,.25), rgba(43,238,227,.12)), radial-gradient(circle at 80% 20%, rgba(43,238,227,.25), transparent 60%)">
+          <span class="material-symbols-outlined glyph">${x.icon}</span>
+          <div><span class="eyebrow" style="color:var(--teal);font-size:8px;display:block;margin-bottom:3px">${libTab==='Scripture'?'Sacred Text':libTab==='Crystals'?'Crystal Library':libTab==='Sacred Oils'?'Anointing Oil':libTab==='Gifts'?T('senses'):'Sacred Symbol'}${x.book?' · '+x.book:''}</span>
+          <div style="font-size:19px;font-weight:700">${esc(x.name)}</div></div>
+        </div>
+        <div class="lib-body" style="border-top:1px solid rgba(255,255,255,.05)">
+          <div style="border-right:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.01)">
+            <h4 class="accent-p">Selah Meaning</h4><p>${esc(x.meaning)}</p>
+          </div>
+          <div style="background:rgba(173,43,238,.05)">
+            <h4 class="accent-t">My Revelation</h4>
+            <textarea data-rev="${x.key}" placeholder="What has this meant in your life…">${esc(rev)}</textarea>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </main>` + navBar('space');
+}
+function wireLibrary(){
+  const q = document.getElementById('lib-q');
+  q.addEventListener('input', ()=>{ libQ=q.value;
+    /* re-render list only (cheap enough to re-render whole view but keep focus) */
+    const pos=q.selectionStart; render(); const nq=document.getElementById('lib-q'); nq.focus(); nq.setSelectionRange(pos,pos);
+  });
+  document.querySelectorAll('[data-rev]').forEach(t=>{
+    t.addEventListener('change', ()=>{ S.revelations[t.dataset.rev]=t.value; save(); toast('Revelation kept.'); });
+  });
+}
+</script>
+<script>
+/* ================= COLLECTIVE PULSE ================= */
+let pulseTab = 'intention';
+function globalPatterns(){
+  const tally = {};
+  S.moments.forEach(m=>m.symbols.forEach(s=>tally[s]=(tally[s]||0)+1));
+  ['dove','11:11','feather','stairs','light'].forEach(s=>tally[s]=tally[s]||0);
+  const seedCounts = {'dove':248,'11:11':812,'feather':1104,'stairs':94,'light':305};
+  return Object.entries(tally).map(([k,n])=>({k, name:SYMBOLS[k].name, icon:SYMBOLS[k].icon, n:n+(seedCounts[k]||Math.floor(20+((k.length*37)%180)))})).sort((a,b)=>b.n-a.n).slice(0,7);
+}
+function actLabel(p){ return p.kind==='victory' ? T('act2') : T('act1'); }
+function viewPulse(){
+  if(window.BK && BK.on) BK.maybeRefreshPulse();
+  const posts = S.pulse.filter(p=>pulseTab==='all'||(pulseTab==='intention'?p.kind==='intention':p.kind==='victory'));
+  const pats = globalPatterns();
+  const online = 1148 + (new Date().getHours()*37)%400;
+  return appHeader('Collective','Pulse') + `<main class="px" style="padding-top:20px">
+    <section class="section" style="text-align:center">
+      <div style="position:relative;width:190px;height:190px;margin:0 auto">
+        <div style="position:absolute;inset:-20px;border-radius:50%;background:rgba(43,238,227,.08);filter:blur(30px)"></div>
+        <div style="position:relative;width:100%;height:100%;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle at 32% 30%, rgba(43,238,227,.35), rgba(173,43,238,.3) 45%, #0a0614 78%);box-shadow:0 0 60px rgba(19,236,200,.15), inset 0 0 40px rgba(0,0,0,.5);overflow:hidden">
+          <div style="position:absolute;inset:0;background-image:radial-gradient(circle, rgba(255,255,255,.5) .5px, transparent .5px);background-size:22px 22px;opacity:.3"></div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);white-space:nowrap" class="chip"><i style="width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)"></i>${online.toLocaleString()} PEOPLE HERE NOW</div>
+      </div>
+    </section>
+
+    <section class="section" style="margin-top:30px">
+      <div class="section-head"><span class="eyebrow">Global Patterns</span><span style="font-size:9px;color:var(--ink-30)">what people are noticing today</span></div>
+      <div class="pill-row" style="gap:14px">
+        ${pats.map(p=>`<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div class="sym-circle">${p.k==='11:11'?'<span style="font-size:15px;font-weight:800;letter-spacing:-.04em">11:11</span>':`<span class="material-symbols-outlined" style="font-size:26px;font-weight:300">${p.icon}</span>`}</div>
+          <div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.75)">${esc(p.name)}</div>
+          <div style="font-size:8px;color:var(--ink-40);margin-top:2px">${p.n.toLocaleString()} people today</div></div>
+        </div>`).join('')}
+      </div>
+    </section>
+
+    <section class="section" style="display:flex;gap:26px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:18px">
+      <button style="background:none;border:none;cursor:pointer;padding:0 0 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:${pulseTab==='intention'?'#fff':'rgba(255,255,255,.3)'};border-bottom:2px solid ${pulseTab==='intention'?'var(--teal)':'transparent'}" onclick="pulseTab='intention';render()">${T('pulseTab1')}</button>
+      <button style="background:none;border:none;cursor:pointer;padding:0 0 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:${pulseTab==='victory'?'#fff':'rgba(255,255,255,.3)'};border-bottom:2px solid ${pulseTab==='victory'?'var(--teal)':'transparent'}" onclick="pulseTab='victory';render()">${T('pulseTab2')}</button>
+    </section>
+
+    ${posts.map(p=>{
+      const acted = S.pulseActs[p.id];
+      const label = acted ? 'With them ✦' : actLabel(p);
+      return `<div class="glass pulse-card">
+      <div class="pulse-head">
+        <div style="display:flex;align-items:center;gap:13px">
+          <div class="pulse-ava">${esc(p.name.charAt(0))}</div>
+          <div><div style="font-size:15px;font-weight:700">${esc(p.name)}</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:${p.kind==='victory'?'#bf61ff':'rgba(43,238,227,.7)'}">${esc(p.where)}</div></div>
+        </div>
+        <span class="chip ${p.kind==='victory'?'purple':'dim'}">${esc(p.cat)}</span>
+      </div>
+      <p style="font-size:15px;line-height:1.6;color:rgba(255,255,255,.88);margin-bottom:16px;${p.kind==='intention'?'font-style:italic;font-weight:300':''}">${esc(p.text)}</p>
+      <button class="grad-btn" style="padding:14px;font-size:12px;${acted?'opacity:.55':''}" onclick="pulseAct('${p.id}')">${label} · ${(p.acts + (acted?1:0)).toLocaleString()}</button>
+    </div>`;}).join('')}
+
+    <button class="ghost-btn" style="margin-top:6px;margin-bottom:30px;padding:18px;border-color:rgba(43,238,227,.3)" onclick="openTestimony()"><span class="material-symbols-outlined accent-t" style="font-size:20px">add_circle</span>${T('shareCta')}</button>
+  </main>` + navBar('pulse');
+}
+function pulseAct(id){
+  if(S.pulseActs[id]){ toast('You are already with them on this one.'); return; }
+  S.pulseActs[id]=true; save(); render();
+  if(window.BK && BK.on) BK.actOnPulse(id);
+  toast('Added yours. They will feel the support.');
+}
+function openTestimony(){
+  openModal(`
+    <div style="text-align:center;margin-bottom:22px">
+      <img src="${LOGO}" style="width:56px;height:56px;border-radius:50%;box-shadow:0 0 24px rgba(173,43,238,.5)" alt="">
+      <h2 style="font-size:22px;font-weight:700;margin-top:14px">Share the <span class="accent-p">Good News</span></h2>
+      <p class="eyebrow" style="margin-top:6px">Let people celebrate with you</p>
+    </div>
+    <textarea id="tm-text" style="min-height:100px;border-radius:18px;margin-bottom:14px" placeholder="How was this fulfilled?"></textarea>
+    <select id="tm-cat" style="margin-bottom:18px">${['Victory','Provision','Peace','Healing','Clarity'].map(c=>`<option>${c}</option>`).join('')}</select>
+    <button class="grad-btn" onclick="publishTestimony()">Share It</button>
+    <p class="tagline" style="text-align:center;margin-top:18px;font-size:9px">PAUSE • REFLECT • DISCERN</p>
+  `);
+}
+function publishTestimony(){
+  const t = document.getElementById('tm-text').value.trim();
+  if(!t){ toast('Write what happened first.'); return; }
+  const cat = document.getElementById('tm-cat').value;
+  const post = {id:'u'+Date.now(), name:S.user.soulName||'A friend', where:'You', cat, kind:'victory', text:t, acts:0};
+  S.pulse.unshift(post);
+  if(window.BK && BK.on) BK.pushPulse(post);
+  save(); closeModal(); pulseTab='victory'; go('pulse');
+  toast('Shared. Let them celebrate with you.');
+}
+
+/* ================= PETITIONS + VICTORIES ================= */
+function viewPetitions(){
+  const list = S.petitions.filter(p=>!p.answered);
+  return appHeader('Selah','Together','Pause, reflect, discern') + `<main class="px" style="padding-top:20px">
+    <div class="section-head">
+      <h1 class="screen-title">${T('petitionsTitle')}</h1>
+      <button class="icon-mini" onclick="go('victories')" title="Victory Wall"><span class="material-symbols-outlined" style="font-size:18px">workspace_premium</span></button>
+    </div>
+    ${list.length===0?`<div class="glass card" style="border-radius:24px;text-align:center;padding:36px 24px;color:var(--ink-40);font-size:14px;line-height:1.7">Nothing here yet.<br>Add your first ${T('petitionOne')} below.</div>`:''}
+    ${list.map(p=>{
+      const days = Math.max(1, Math.ceil((Date.now()-new Date(p.createdAt))/86400000));
+      return `<div class="glass card" style="border-radius:24px;margin-bottom:16px;border-color:rgba(43,238,227,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><span class="eyebrow" style="font-size:9px"><span class="material-symbols-outlined accent-t" style="font-size:14px;vertical-align:-3px">hourglass_bottom</span> ${esc(p.cat)}</span>
+        <h3 style="font-size:17px;font-weight:600;margin-top:6px">${esc(p.title)}</h3></div>
+        <button class="icon-mini" onclick="delPetition('${p.id}')" title="Release"><span class="material-symbols-outlined" style="font-size:16px">delete</span></button>
+      </div>
+      ${p.body?`<p style="font-size:13px;color:var(--ink-70);line-height:1.6;margin-bottom:12px">${esc(p.body)}</p>`:''}
+      <div style="display:flex;gap:10px;margin-bottom:14px"><span class="chip dim">${days} day${days===1?'':'s'} active</span></div>
+      <button class="grad-btn" style="padding:13px;font-size:12px" onclick="markAnswered('${p.id}')">${T('markDone')}</button>
+    </div>`;}).join('')}
+    <button class="ghost-btn" style="padding:17px;margin-bottom:30px" onclick="openPetitionForm()"><span class="material-symbols-outlined accent-t" style="font-size:20px">add_circle</span>${T('addPetition')}</button>
+  </main>` + navBar('home');
+}
+function openPetitionForm(){
+  openModal(`
+    <h2 style="font-size:21px;font-weight:700;margin-bottom:6px">New <span class="accent-t">${T('petitionOne').replace(/^./,c=>c.toUpperCase())}</span></h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:20px;line-height:1.6">Name what you are hoping for. Selah keeps track of it with you.</p>
+    <label class="field-label">Title</label>
+    <input id="pt-title" placeholder="Clarity on the move…" style="margin-bottom:14px">
+    <label class="field-label">The ask</label>
+    <textarea id="pt-body" style="min-height:80px;margin-bottom:14px" placeholder="Say as much or as little as you want"></textarea>
+    <label class="field-label">Frequency</label>
+    <select id="pt-cat" style="margin-bottom:20px">${['Clarity','Healing','Provision','Peace','Protection','Relationship','Creative Flow'].map(c=>`<option>${c}</option>`).join('')}</select>
+    <button class="grad-btn" onclick="addPetition()">${T('placeCta')}</button>
+  `);
+}
+function addPetition(){
+  const title = document.getElementById('pt-title').value.trim();
+  if(!title){ toast('Give it a short title first.'); return; }
+  S.petitions.unshift({id:'pt'+Date.now(), title, body:document.getElementById('pt-body').value.trim(),
+    cat:document.getElementById('pt-cat').value, answered:false, createdAt:new Date().toISOString()});
+  save(); closeModal(); go('petitions'); toast('Added. It is on your list now.');
+}
+function delPetition(id){ if(!confirmAsk('Remove this from your list?')) return; S.petitions=S.petitions.filter(p=>p.id!==id); save(); render(); }
+function markAnswered(id){
+  const p = S.petitions.find(x=>x.id===id); if(!p) return;
+  p.answered = true; p.answeredAt = new Date().toISOString(); save();
+  go('victories'); toast('Recorded. Worth pausing over. Selah.');
+}
+function viewVictories(){
+  const wins = S.petitions.filter(p=>p.answered);
+  const waiting = S.petitions.filter(p=>!p.answered);
+  return appHeader('Selah','Wall','The good that came back') + `<main class="px" style="padding-top:20px">
+    <h1 class="screen-title" style="margin-bottom:4px">${T('wall')}</h1>
+    <p class="tagline" style="font-size:9px;margin-bottom:18px">PAUSE • REFLECT • DISCERN</p>
+    <div class="glass card" style="border-radius:20px;display:flex;justify-content:space-around;align-items:center;padding:16px;margin-bottom:22px">
+      <div style="text-align:center"><div style="font-size:19px;font-weight:700">${wins.length}</div><div class="eyebrow" style="font-size:8px">Answered</div></div>
+      <div style="width:1px;height:30px;background:rgba(255,255,255,.1)"></div>
+      <div style="text-align:center"><div style="font-size:19px;font-weight:700;color:var(--teal)">${waiting.length}</div><div class="eyebrow" style="font-size:8px">Still Active</div></div>
+    </div>
+    ${wins.length===0 && waiting.length===0?`<div class="glass card" style="border-radius:24px;text-align:center;padding:36px;color:var(--ink-40);font-size:14px;line-height:1.7">Nothing on the wall yet. It fills up as things come through.</div>`:''}
+    <div class="masonry">
+      ${wins.map(p=>`<div class="masonry-item glass card" style="border-radius:20px;padding:16px;border-color:rgba(43,238,227,.3)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span class="material-symbols-outlined accent-t" style="font-size:19px">verified</span><span style="font-size:8px;color:var(--ink-40);font-weight:700;text-transform:uppercase">${new Date(p.answeredAt).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div>
+        <h4 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-50);margin-bottom:5px">${esc(p.cat)}</h4>
+        <p style="font-size:12px;line-height:1.55;color:rgba(255,255,255,.9);font-weight:500;margin-bottom:12px">${esc(p.title)}</p>
+        <button class="grad-btn" style="padding:9px;font-size:9px;border-radius:10px" onclick="shareWin('${p.id}')">${T('shareCta')}</button>
+      </div>`).join('')}
+      ${waiting.map(p=>`<div class="masonry-item glass card" style="border-radius:20px;padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span class="material-symbols-outlined" style="font-size:19px;color:var(--ink-40)">hourglass_bottom</span><span style="font-size:8px;color:var(--ink-30);font-weight:700;text-transform:uppercase">Awaiting</span></div>
+        <h4 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-40);margin-bottom:5px">${esc(p.cat)}</h4>
+        <p style="font-size:12px;line-height:1.55;color:var(--ink-50);font-style:italic">${esc(p.title)}</p>
+      </div>`).join('')}
+    </div>
+    <button class="ghost-btn" style="padding:17px;margin:10px 0 30px" onclick="openPetitionForm()"><span class="material-symbols-outlined accent-t" style="font-size:20px">add_circle</span>${T('addPetition')}</button>
+  </main>` + navBar('home');
+}
+function shareWin(id){
+  const p = S.petitions.find(x=>x.id===id); if(!p) return;
+  const post = {id:'u'+Date.now(), name:S.user.soulName||'A friend', where:'You', cat:p.cat, kind:'victory', text:p.title + (p.body?' - '+p.body:''), acts:0};
+  S.pulse.unshift(post);
+  if(window.BK && BK.on) BK.pushPulse(post);
+  save(); pulseTab='victory'; go('pulse'); toast('Shared. Let them celebrate with you.');
+}
+
+/* ================= HIDDEN SANCTUARY (VAULT) ================= */
+let pinBuf = '', pinFirst = null;
+function viewVaultPin(){
+  const setting = S.vaultPin===null;
+  
+  return `<div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:30px 24px 40px">
+    <div style="width:100%;display:flex;justify-content:flex-start"><button class="icon-mini" style="width:40px;height:40px" onclick="pinBuf='';pinFirst=null;go('home')"><span class="material-symbols-outlined">arrow_back_ios_new</span></button></div>
+    <h1 style="font-size:32px;font-weight:700;margin-top:26px">Private <span style="color:#0fddf0">Vault</span></h1>
+    <p class="tagline" style="margin-top:12px;margin-bottom:34px">PAUSE • REFLECT • DISCERN</p>
+    <img src="${LOGO}" style="width:104px;height:104px;border-radius:50%;box-shadow:0 0 50px rgba(15,221,240,.25), 0 0 80px rgba(126,34,206,.3);margin-bottom:30px" alt="">
+    <p style="font-size:13px;color:var(--ink-50);margin-bottom:6px">${setting?(pinFirst===null?'Choose a 4-digit PIN for entries you want kept extra private.':'Enter it once more to confirm.'):'Enter your 4-digit PIN.'}</p>
+    <div class="pin-dots">${[0,1,2,3].map(i=>`<i class="${i<pinBuf.length?'fill':''}"></i>`).join('')}</div>
+    <div class="keypad">
+      ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="key" onclick="pinPress('${n}')">${n}</button>`).join('')}
+      <span></span>
+      <button class="key" onclick="pinPress('0')">0</button>
+      <button class="key" style="border:none;background:none;box-shadow:none" onclick="pinBuf=pinBuf.slice(0,-1);render()"><span class="material-symbols-outlined" style="font-size:28px;color:rgba(255,255,255,.4)">backspace</span></button>
+    </div>
+    ${!setting?`<button style="background:none;border:none;color:rgba(248,250,252,.6);margin-top:30px;cursor:pointer;font-size:13px" onclick="forgotPin()">Forgot your PIN?</button>`:''}
+  </div>`;
+}
+function wireVaultPin(){}
+function pinPress(n){
+  if(pinBuf.length>=4) return;
+  pinBuf += n; 
+  if(pinBuf.length===4){
+    setTimeout(()=>{
+      if(S.vaultPin===null){
+        if(pinFirst===null){ pinFirst=pinBuf; pinBuf=''; render(); return; }
+        if(pinFirst===pinBuf){ S.vaultPin=pinBuf; save(); pinBuf=''; pinFirst=null; vaultOpen=true; go('vaultlist'); toast('Your vault is set up and open.'); }
+        else { toast('Those did not match. Start again.'); pinFirst=null; pinBuf=''; render(); }
+        return;
+      }
+      if(pinBuf===S.vaultPin){ pinBuf=''; vaultOpen=true; go('vaultlist'); }
+      else { toast('That is not the right PIN.'); pinBuf=''; render(); }
+    }, 120);
+  } else render();
+}
+function forgotPin(){
+  if(confirmAsk('Reset your PIN? Vault entries will move back to your open journal.')){
+    S.vaultPin=null; S.moments.forEach(m=>m.vault=false); save(); pinBuf=''; go('home');
+    toast('PIN reset. Vault entries are back in your journal.');
+  }
+}
+function viewVaultList(){
+  if(!vaultOpen){ route='vault'; return viewVaultPin(); }
+  const list = S.moments.filter(m=>m.vault);
+  return appHeader('Private','Vault','Just for you') + `<main class="px" style="padding-top:20px">
+    <div class="section-head"><h1 class="screen-title">Private <span style="color:#0fddf0">Entries</span></h1>
+    <button class="chip dim" style="cursor:pointer" onclick="vaultOpen=false;go('home')"><span class="material-symbols-outlined" style="font-size:13px">lock</span>Lock and leave</button></div>
+    ${list.length===0?`<div class="glass card" style="border-radius:24px;text-align:center;padding:36px;color:var(--ink-40);font-size:13px;line-height:1.7">Nothing here yet. From any journal entry, tap the lock to move it here.</div>`:''}
+    ${list.map(m=>momentCard(m)).join('')}
+  </main>` + navBar('home');
+}
+
+/* ================= MODAL + PAYWALL ================= */
+function openModal(html){
+  const v = document.getElementById('modal-veil');
+  document.getElementById('modal-card').innerHTML = `<button class="modal-close" onclick="closeModal()"><span class="material-symbols-outlined">close</span></button>` + html;
+  v.classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-veil').classList.remove('open'); }
+document.getElementById('modal-veil').addEventListener('click', e=>{ if(e.target.id==='modal-veil') closeModal(); });
+function openClairInfo(){
+  openModal(`
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">${T('senses')}</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:18px;line-height:1.6">Different traditions use different names for the same experiences. Here is what each one means, with other names you may know it by.</p>
+    ${CLAIRS.map(c=>{const info=CLAIR_INFO[c.k];const lbl=giftLabel(c.k);return `
+      <div class="glass card" style="border-radius:16px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span class="material-symbols-outlined accent-t" style="font-size:19px">${c.icon}</span>
+          <b style="font-size:14px">${lbl}</b>
+          ${lbl!==c.k?`<span style="font-size:10px;color:var(--ink-40)">(${c.k})</span>`:''}
+        </div>
+        <p style="font-size:12px;color:var(--ink-70);line-height:1.55">${info.desc}</p>
+        <p style="font-size:11px;color:rgba(43,238,227,.65);margin-top:5px">Also called: ${info.syn}</p>
+      </div>`;}).join('')}
+  `);
+}
+let payPlan = 'annual';
+function openPaywall(){
+  openModal(`
+    <div style="text-align:center;margin-bottom:20px">
+      <img src="${LOGO}" style="width:76px;height:76px;border-radius:50%;box-shadow:0 0 34px rgba(173,43,238,.55)" alt="">
+      <h2 style="font-size:30px;font-weight:700;margin-top:14px;letter-spacing:.02em">Selah Pro</h2>
+      <p style="font-size:15px;color:rgba(173,43,238,.85);font-style:italic;margin-top:4px">Elevate your spiritual resonance</p>
+    </div>
+    <div class="glass card" style="border-radius:20px;margin-bottom:20px;padding:18px">
+      ${[['temp_preferences_custom','Unlimited Selah Discernment'],['psychology_alt','Advanced sacred insights'],['picture_as_pdf','Export your Selah Book'],['shield_with_heart','Priority sanctuary features']].map(([i,t])=>`
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(43,238,222,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined accent-t" style="font-size:18px">${i}</span></div>
+        <span style="font-size:14px;font-weight:500">${t}</span></div>`).join('')}
+    </div>
+    <div class="price-opt ${payPlan==='annual'?'on':''}" onclick="payPlan='annual';openPaywall()">
+      <span class="save-badge">Save 52%</span>
+      <div><div class="eyebrow" style="color:var(--primary);font-size:9px;margin-bottom:4px">Annual Access</div>
+      <div style="font-size:20px;font-weight:700">$44.44 <span style="font-size:13px;font-weight:400;color:var(--ink-50)">/ year</span></div></div>
+      <div class="radio"></div>
+    </div>
+    <div class="price-opt ${payPlan==='monthly'?'on':''}" onclick="payPlan='monthly';openPaywall()">
+      <div><div class="eyebrow" style="font-size:9px;margin-bottom:4px">Monthly</div>
+      <div style="font-size:20px;font-weight:700">$7.77 <span style="font-size:13px;font-weight:400;color:var(--ink-50)">/ month</span></div></div>
+      <div class="radio"></div>
+    </div>
+    <div class="glass card" style="border-radius:16px;padding:14px;margin-top:4px;margin-bottom:14px;border-color:rgba(43,238,227,.35);text-align:center">
+      <span class="chip"><span class="material-symbols-outlined" style="font-size:13px">celebration</span>Testing season</span>
+      <p style="font-size:12px;color:var(--ink-70);margin-top:10px;line-height:1.6">While Selah is in testing, everyone gets Pro free. The pricing above is what launch will look like.</p>
+    </div>
+    <button class="grad-btn" style="padding:18px;font-size:15px;text-transform:none;letter-spacing:.02em" onclick="activatePro()">Continue with Pro, Free</button>
+  `);
+}
+function activatePro(){
+  S.user.tier='pro'; save(); closeModal(); render();
+  toast('Pro is active. Enjoy.');
+}
+
+/* ================= SOUL (PROFILE + SETTINGS) ================= */
+function viewSoul(){
+  const u = S.user;
+  return appHeader('Your','Profile','Settings and preferences') + `<main class="px" style="padding-top:22px">
+    <section class="section" style="text-align:center">
+      <div style="width:86px;height:86px;border-radius:50%;margin:0 auto 14px;background:linear-gradient(135deg,var(--primary),var(--teal));display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;box-shadow:0 0 34px rgba(173,43,238,.4)">${initialOf()}</div>
+      <h1 style="font-size:24px;font-weight:700">${esc(u.soulName)}</h1>
+      <p style="font-size:12px;color:var(--ink-40);margin-top:4px">${esc(S.auth.contact)}</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+        <span class="chip purple">✦ Selah Pro · testing</span>
+        <span class="chip dim">${esc((u.lenses&&u.lenses.length>1)?u.lens+' +'+(u.lenses.length-1):u.lens)}${u.customLens?' · '+esc(u.customLens):''}</span>
+        ${u.season?`<span class="chip dim">${esc(seasonLabel(u.season))}</span>`:''}
+      </div>
+    </section>
+    <section class="section" style="text-align:center"><button class="chip purple" style="cursor:pointer;border:1px solid rgba(173,43,238,.4)" onclick="openPaywall()"><span class="material-symbols-outlined ms-fill" style="font-size:13px">workspace_premium</span>Pro is free during testing · see launch pricing</button></section>
+    ${u.gifts.length?`<section class="section">
+      <div class="section-head"><span class="eyebrow">Your gifts, in your language</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">${u.gifts.map(g=>`<span class="chip">${esc(giftLabel(g))}</span>`).join('')}</div>
+    </section>`:''}
+    <section class="section">
+      <div class="section-head"><span class="eyebrow">Settings</span></div>
+      <div class="glass" style="border-radius:22px;overflow:hidden">
+        ${soulRow('translate','Wisdom lens', u.lens, 'editLens()')}
+        ${soulRow('flare','Name for the sacred', u.divineName, 'editDivine()')}
+        ${soulRow('tune','Comfort matrix', 'Adjust what Selah shows', 'editComfort()')}
+        ${soulRow('menu_book','Sacred text', esc(userBook()), 'editBook()')}
+        ${soulRow('shield_with_heart','Private Vault', S.vaultPin===null?'Set a PIN':'Locked · tap to open', "go('vault')")}
+        ${soulRow('motion_photos_off','Calm mode', S.calm?'On · animations off':'Off', 'toggleCalm()')}
+        ${soulRow('picture_as_pdf','Export Selah Book', u.tier==='pro'?'Print or save your journal':'Pro feature', 'exportBook()')}
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><span class="eyebrow">Data and Privacy</span></div>
+      <div class="glass card" style="border-radius:20px;font-size:12px;color:var(--ink-50);line-height:1.7">
+        Everything you write lives only in this browser on this device. Nothing is uploaded anywhere in this test build. Clearing site data erases it, so export your Selah Book if you want a copy.
+      </div>
+    </section>
+    <section class="section" style="padding-bottom:30px">
+      <button class="ghost-btn" style="color:var(--danger);border-color:rgba(255,93,122,.3)" onclick="signOut()"><span class="material-symbols-outlined" style="font-size:18px">logout</span>Sign out</button>
+    </section>
+  </main>` + navBar('soul');
+}
+function soulRow(icon,title,sub,fn){
+  return `<button style="display:flex;align-items:center;gap:14px;width:100%;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.05);padding:16px 18px;cursor:pointer;text-align:left;color:#fff" onclick="${fn}">
+    <span class="material-symbols-outlined" style="color:var(--ink-40);font-size:21px">${icon}</span>
+    <span style="flex:1"><span style="display:block;font-size:14px;font-weight:600">${title}</span><span style="display:block;font-size:11px;color:var(--ink-40);margin-top:2px">${sub}</span></span>
+    <span class="material-symbols-outlined" style="color:rgba(255,255,255,.2);font-size:18px">chevron_right</span>
+  </button>`;
+}
+function editLens(){
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Primary Language</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">This is the tradition whose language Selah leads with. Your other selected traditions stay part of your profile.</p>
+    ${LENSES.map(l=>`<button class="opt-card ${S.user.lens===l?'on':''}" onclick="S.user.lens='${l}';save();closeModal();render();toast('Selah now speaks in ${l} language.')"><span class="material-symbols-outlined">auto_awesome</span>${l}</button>`).join('')}`);
+}
+function editDivine(){
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Name for the Sacred</h2>
+    ${DIVINE_NAMES.map(d=>`<button class="opt-card ${S.user.divineName===d?'on':''}" onclick="S.user.divineName='${d}';save();closeModal();render()"><span class="material-symbols-outlined">flare</span>${d}</button>`).join('')}`);
+}
+function editComfort(){
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Comfort Matrix</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:20px;line-height:1.6">1 keeps a practice out of sight. 5 welcomes it fully.</p>
+    ${COMFORT_CATS.map(([k,name,icon])=>`
+      <div class="comfort-row">
+        <div class="cr-head"><span class="cr-name" style="font-size:12px">${name}</span><span class="cr-val">${S.user.comfort[k]}/5</span></div>
+        <div class="dots">${[1,2,3,4,5].map(n=>`<button class="${S.user.comfort[k]>=n?'on':''}" onclick="S.user.comfort['${k}']=${n};save();editComfort()">${n}</button>`).join('')}</div>
+      </div>`).join('')}
+    <button class="grad-btn" style="margin-top:10px" onclick="closeModal();render();toast('Updated. The app reshapes around your choices.')">Done</button>`);
+}
+function editBook(){
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Sacred Text</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">The daily passage, the Scripture shelf, and Selah's ${T('discernNoun')}s draw from this.</p>
+    <button class="opt-card ${(!S.user.holyBookCustom && (!S.user.holyBook||S.user.holyBook==='auto'))?'on':''}" onclick="S.user.holyBook='auto';S.user.holyBookCustom='';save();closeModal();render()"><span class="material-symbols-outlined">auto_awesome</span>Match my tradition<small>Currently ${esc(LENS_BOOK[S.user.lens]||'a blend of many')}</small></button>
+    ${HOLY_BOOKS.map(b=>`<button class="opt-card ${(!S.user.holyBookCustom && S.user.holyBook===b)?'on':''}" onclick="S.user.holyBook='${b.replace(/'/g,"\\'")}';S.user.holyBookCustom='';save();closeModal();render()"><span class="material-symbols-outlined">menu_book</span>${b}</button>`).join('')}
+    <label class="field-label" style="margin-top:10px">A different one?</label>
+    <input id="book-custom" placeholder="Name it…" value="${esc(S.user.holyBookCustom||'')}">
+    <button class="grad-btn" style="margin-top:14px" onclick="S.user.holyBookCustom=document.getElementById('book-custom').value.trim();save();closeModal();render()">Save</button>`);
+}
+function toggleCalm(){ S.calm=!S.calm; save(); render(); toast(S.calm?'Calm mode on. Animations are off.':'Calm mode off.'); }
+function exportBook(){
+  if(S.user.tier!=='pro'){ openPaywall(); return; }
+  const wins = S.petitions.filter(p=>p.answered);
+  openModal(`
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Selah Book</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">A reading copy of everything you have sealed. Select all and copy it into any document, or use your browser's print option while this page is open.</p>
+    <div class="glass" style="border-radius:16px;padding:16px;max-height:44dvh;overflow-y:auto;font-size:13px;line-height:1.7;color:rgba(255,255,255,.85)">
+      <b style="font-size:15px">The Selah Book of ${esc(S.user.soulName)}</b><br>
+      <span style="color:var(--ink-40);font-size:11px">Pause • Reflect • Discern — ${new Date().toLocaleDateString()}</span>
+      <div style="margin-top:14px"><b class="accent-t" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em">Moments (${S.moments.length})</b></div>
+      ${S.moments.map(m=>`<div style="border-left:2px solid rgba(173,43,238,.4);padding-left:12px;margin:12px 0">
+        <span style="color:var(--ink-40);font-size:10px">${fmtDate(m.createdAt)} · ${m.type==='dream'?'Dream':'Waking'}${m.emotion?' · '+esc(m.emotion):''}</span><br>${esc(m.text)}
+        ${m.reflection?`<div style="color:rgba(43,238,227,.8);font-size:12px;margin-top:6px">Selah Insight: ${esc(m.reflection)}</div>`:''}</div>`).join('')||'<p style="color:var(--ink-40)">None yet.</p>'}
+      <div style="margin-top:14px"><b class="accent-t" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em">Victories (${wins.length})</b></div>
+      ${wins.map(p=>`<div style="border-left:2px solid rgba(43,238,227,.4);padding-left:12px;margin:12px 0"><span style="color:var(--ink-40);font-size:10px">${new Date(p.answeredAt).toLocaleDateString()} · ${esc(p.cat)}</span><br>${esc(p.title)}${p.body?' — '+esc(p.body):''}</div>`).join('')||'<p style="color:var(--ink-40)">None yet.</p>'}
+    </div>
+    <button class="grad-btn" style="margin-top:16px" onclick="try{window.print()}catch(e){toast('Use your browser menu to print this page.')}">Print / Save as PDF</button>
+  `);
+}
+function signOut(){
+  if(!confirmAsk('Sign out? Your writing stays safe for when you come back.')) return;
+  if(window.BK && BK.on) BK.signOut();
+  S.auth=null; save(); authStage='enter'; authContact=''; route='home'; render();
+}
+
+
+/* ================= BACKEND (Supabase + Gemini edge function) ================= */
+const BK = {
+  on:false, sb:null, session:null, _pushT:null, _pulseAt:0,
+  friendly(e, fallback){
+    const m = (e && (e.message || e.error_description || e.msg)) || '';
+    if(/rate limit/i.test(m)) return 'Too many tries in a row. Give it a minute, then try again.';
+    if(/expired/i.test(m)) return 'That code expired. Request a fresh one.';
+    if(/invalid/i.test(m)) return 'That code does not match. Check it and try again.';
+    if(/sms|phone|twilio|messagebird|vonage/i.test(m)) return 'Phone sign in is not switched on yet in the backend. Use email for now.';
+    return m || fallback;
+  },
+  normPhone(v){
+    const d = v.replace(/[^\d+]/g,'');
+    if(d.startsWith('+')) return d;
+    const digits = d.replace(/\D/g,'');
+    return digits.length===10 ? '+1'+digits : '+'+digits;
+  },
+  async init(){
+    try{
+      const cfg = window.SELAH_CONFIG || {};
+      if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || /PASTE_/.test(cfg.SUPABASE_URL+cfg.SUPABASE_ANON_KEY) || !window.supabase) return;
+      this.sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+      this.on = true;
+      const { data:{ session } } = await this.sb.auth.getSession();
+      this.session = session;
+      this.sb.auth.onAuthStateChange((_e, s)=>{ this.session = s; });
+      if(session){
+        if(!S.auth){
+          S.auth = {method:'session', contact: session.user.email || session.user.phone || 'you', at:new Date().toISOString()};
+        }
+        await this.pullState();
+        store.set(S);
+      } else if(S.auth){
+        S.auth = null; store.set(S);
+      }
+    }catch(e){ console.warn('Backend init failed; running local.', e); }
+  },
+  async sendOtp(method, contact){
+    if(method==='email'){
+      const { error } = await this.sb.auth.signInWithOtp({ email: contact, options:{ shouldCreateUser:true } });
+      if(error) throw error;
+    } else {
+      const { error } = await this.sb.auth.signInWithOtp({ phone: this.normPhone(contact) });
+      if(error) throw error;
+    }
+  },
+  async verifyOtp(method, contact, token){
+    const args = method==='email'
+      ? { email: contact, token, type:'email' }
+      : { phone: this.normPhone(contact), token, type:'sms' };
+    const { data, error } = await this.sb.auth.verifyOtp(args);
+    if(error) throw error;
+    this.session = data.session;
+  },
+  exportState(){ const {auth, ...rest} = S; return rest; },
+  schedulePush(){
+    clearTimeout(this._pushT);
+    this._pushT = setTimeout(()=>this.pushState(), 1200);
+  },
+  async pushState(){
+    if(!this.session) return;
+    try{
+      await this.sb.from('soul_state').upsert({
+        user_id: this.session.user.id, state: this.exportState(), updated_at: new Date().toISOString()
+      });
+    }catch(e){ console.warn('Sync failed (kept locally).', e); }
+  },
+  async pullState(){
+    if(!this.session) return;
+    try{
+      const { data, error } = await this.sb.from('soul_state').select('state').eq('user_id', this.session.user.id).maybeSingle();
+      if(error) throw error;
+      if(data && data.state && data.state.onboarded){
+        const keepAuth = S.auth;
+        S = Object.assign({}, S, data.state);
+        S.auth = keepAuth;
+      }
+    }catch(e){ console.warn('Could not pull remote state; using local.', e); }
+  },
+  async pushPulse(post){
+    if(!this.session) return;
+    try{
+      await this.sb.from('pulse_posts').insert({
+        id: post.id, user_id: this.session.user.id, name: post.name,
+        where_label: post.where, cat: post.cat, kind: post.kind, text_body: post.text
+      });
+    }catch(e){ console.warn('Share failed; kept locally.', e); }
+  },
+  async actOnPulse(id){
+    if(!this.session) return;
+    try{
+      const p = S.pulse.find(x=>x.id===id);
+      await this.sb.from('pulse_posts').update({ acts: (p?p.acts:0) }).eq('id', id);
+    }catch(e){}
+  },
+  async maybeRefreshPulse(){
+    if(!this.session || Date.now()-this._pulseAt < 30000) return;
+    this._pulseAt = Date.now();
+    try{
+      const { data, error } = await this.sb.from('pulse_posts').select('*').order('created_at',{ascending:false}).limit(50);
+      if(error) throw error;
+      if(data){
+        const remote = data.map(r=>({id:r.id, name:r.name, where:r.where_label||'Somewhere out there', cat:r.cat, kind:r.kind, text:r.text_body, acts:r.acts||0}));
+        const seeds = SEED_PULSE.filter(sp=>!remote.some(r=>r.id===sp.id));
+        S.pulse = remote.concat(seeds);
+        store.set(S);
+        if(route==='pulse') render();
+      }
+    }catch(e){ console.warn('Feed refresh failed.', e); }
+  },
+  async discern(J){
+    const packet = {
+      entry_type: J.type, text: J.text, emotion: J.emotion,
+      clairs: J.clairs.map(c=>({ key:c, label:giftLabel(c) })),
+      symbols: J.symbols.map(k=>({ key:k, name:SYMBOLS[k].name, meaning:SYMBOLS[k].meaning })),
+      user: {
+        name: S.user.soulName, lens: S.user.lens, lenses: S.user.lenses||[S.user.lens],
+        custom_lens: S.user.customLens||null, divine_name: S.user.divineName,
+        holy_book: userBook(),
+        season: S.user.season ? seasonLabel(S.user.season) : null,
+        gifts: (S.user.gifts||[]).map(g=>giftLabel(g)), comfort: S.user.comfort,
+        relational_style: S.user.relational, processing_style: S.user.processing,
+        vocabulary: { insight_word: T('discernNoun'), petition_word: T('petitionOne') }
+      }
+    };
+    const { data, error } = await this.sb.functions.invoke('discern', { body: packet });
+    if(error) throw error;
+    if(!data || !data.reflection) throw new Error('Empty discernment');
+    return { reflection: data.reflection, questions: Array.isArray(data.questions) ? data.questions.slice(0,3) : [] };
+  },
+  signOut(){ try{ this.sb.auth.signOut(); }catch(e){} this.session=null; }
+};
+window.BK = BK;
+async function bootApp(){
+  try{ if(typeof BK!=='undefined') await BK.init(); }catch(e){}
+  render();
+}
+
+/* ================= BOOT ================= */
+try{
+  if(document.fonts && document.fonts.load){
+    document.fonts.load('24px "Material Symbols Outlined"').then(()=>document.body.classList.add('icons-ready'));
+  }
+}catch(e){}
+setTimeout(()=>document.body.classList.add('icons-ready'), 2500);
+bootApp();
+</script>
+
+</body>
+</html>
