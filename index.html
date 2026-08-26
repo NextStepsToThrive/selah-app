@@ -341,7 +341,7 @@ const store = {
 /* ---------- state ---------- */
 let S = store.get() || {
   auth:null, onboarded:false,
-  user:{ soulName:'', divineName:'The Divine', divinePronoun:'none', lens:'Universal', explorer:true,
+  user:{ soulName:'', divineName:'The Divine', divineNames:['The Divine'], divinePronoun:'none', divinePronouns:['none'], lens:'Universal', explorer:true,
     comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
     gifts:[], growth:[], relational:'', season:'', processing:'', tier:'free' },
   moments:[], petitions:[], rituals:[], revelations:{}, pulse:[], pulseActs:{},
@@ -357,6 +357,8 @@ if(typeof S.user.relational==='string') S.user.relational = S.user.relational ? 
 if(!Array.isArray(S.user.relational)) S.user.relational = [];
 if(!S.lang) S.lang='en';
 if(!S.user.divinePronoun) S.user.divinePronoun='none';
+if(!Array.isArray(S.user.divineNames) || !S.user.divineNames.length) S.user.divineNames = [S.user.divineName || 'The Divine'];
+if(!Array.isArray(S.user.divinePronouns) || !S.user.divinePronouns.length) S.user.divinePronouns = [S.user.divinePronoun || 'none'];
 save();
 
 /* ---------- lens translation maps ---------- */
@@ -399,13 +401,27 @@ const DEITY_PRONOUNS = [
   {k:'She', label:'She / Her', sub:''},
   {k:'They', label:'They / Them', sub:''}
 ];
+function divineList(){
+  const a = (Array.isArray(S.user.divineNames) && S.user.divineNames.length) ? S.user.divineNames : [S.user.divineName || 'The Divine'];
+  return a;
+}
+function pronounList(){
+  return (Array.isArray(S.user.divinePronouns) && S.user.divinePronouns.length) ? S.user.divinePronouns : [S.user.divinePronoun || 'none'];
+}
+function syncDivine(){
+  if(!Array.isArray(S.user.divineNames) || !S.user.divineNames.length) S.user.divineNames = [S.user.divineName || 'The Divine'];
+  if(!Array.isArray(S.user.divinePronouns) || !S.user.divinePronouns.length) S.user.divinePronouns = ['none'];
+  S.user.divineName = S.user.divineNames[0];
+  S.user.divinePronoun = S.user.divinePronouns[0];
+}
 function deityPossessive(){
-  const u = (typeof OB!=='undefined' && !S.onboarded) ? OB : S.user;
-  const pr = u.divinePronoun || 'none';
+  const ob = (typeof OB!=='undefined' && !S.onboarded);
+  const prList = ob ? (OB.divinePronouns.length ? OB.divinePronouns : ['none']) : pronounList();
+  const pr = prList[0];
   if(pr==='He') return 'His';
   if(pr==='She') return 'Her';
   if(pr==='They') return 'Their';
-  const nm = (u.divineCustom && u.divineCustom.trim()) || u.divineName || 'the Divine';
+  const nm = ob ? (OB.divineNames[0] || (OB.divineCustom && OB.divineCustom.trim()) || 'the Divine') : divineList()[0];
   return nm + '\u2019s';
 }
 const HOLY_BOOKS = ['The Bible','The Qur\u2019an','The Tanakh','The Bhagavad Gita','The Dhammapada','The Guru Granth Sahib','The Tao Te Ching','Sufi Poetry','A blend of many'];
@@ -631,6 +647,10 @@ const ES = {
   'Your gifts':'Tus dones','Your Gifts':'Tus Dones',
   'Choose as many as resonate':'Elige todos los que resuenen',
   'Choose every one that resonates — there is no limit. Tap a selected one to remove it.':'Elige todos los que resuenen — no hay límite. Toca uno seleccionado para quitarlo.',
+  'Primary':'Principal','Names for the sacred':'Nombres de lo sagrado','Names for the Sacred':'Nombres de lo Sagrado',
+  'Choose every name you use — many people use several. The first one you tap is the name Selah leads with.':'Elige cada nombre que uses — muchas personas usan varios. El primero que toques es el que Selah usa primero.',
+  'Choose all that fit — some people mix He and They, or sometimes just use the name. The first one leads.':'Elige todos los que encajen — algunas personas mezclan Él y Elle, o a veces solo usan el nombre. El primero lidera.',
+  'Add your own (optional)':'Añade el tuyo (opcional)','Write it here…':'Escríbelo aquí…',
   'Done':'Listo'
 };
 const ES_RX = [
@@ -912,7 +932,7 @@ function wireAuth(){
 /* ================= ONBOARDING ================= */
 let obStep = 0;
 const OB = {
-  lenses:[], customLens:'', explorer:false, soulName:'', divineName:'The Divine', divineCustom:'', divinePronoun:'none',
+  lenses:[], customLens:'', explorer:false, soulName:'', divineName:'The Divine', divineNames:[], divineCustom:'', divinePronoun:'none', divinePronouns:[],
   holyBook:'auto', holyBookCustom:'',
   comfort:{scripture:3, crystals:3, astrology:3, ancestral:3, divination:3, ritual:3},
   gifts:[], relational:[], season:'', processing:[]
@@ -951,10 +971,12 @@ function viewOnboarding(){
       <label class="field-label">What should we call you?</label>
       <input id="ob-name" placeholder="Your name" value="${esc(u.soulName)}" style="margin-bottom:20px">
       <label class="field-label">What do you call the sacred?</label>
-      <div id="ob-divine">${DIVINE_NAMES.map(d=>`<button class="opt-card ${u.divineName===d && !u.divineCustom?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span>${d}</button>`).join('')}</div>
+      <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose every name you use — many people use several. The first one you tap is the name Selah leads with.</p>
+      <div id="ob-divine">${DIVINE_NAMES.map(d=>{const i=u.divineNames.indexOf(d);return `<button class="opt-card ${i>-1?'on':''}" data-v="${d}"><span class="material-symbols-outlined">flare</span><span style="flex:1">${d}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
       <input id="ob-divine-custom" placeholder="Or write your own…" value="${esc(u.divineCustom)}" style="margin-top:6px">
-      <label class="field-label" style="margin-top:20px">How do you refer to ${esc(u.divineCustom.trim()||u.divineName)}?</label>
-      <div id="ob-pron">${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${u.divinePronoun===pr.k?'on':''}" data-v="${pr.k}"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}</div>
+      <label class="field-label" style="margin-top:20px">How do you refer to ${esc(u.divineNames[0]||u.divineCustom.trim()||'the sacred')}?</label>
+      <p style="font-size:12px;color:var(--ink-50);margin:4px 0 10px;line-height:1.5">Choose all that fit — some people mix He and They, or sometimes just use the name. The first one leads.</p>
+      <div id="ob-pron">${DEITY_PRONOUNS.map(pr=>{const i=u.divinePronouns.indexOf(pr.k);return `<button class="opt-card ${i>-1?'on':''}" data-v="${pr.k}"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}</div>
     `, !!u.soulName.trim());
   }
   if(obStep===1){
@@ -1031,8 +1053,6 @@ function wireOnboarding(){
   if(bookSel) bookSel.addEventListener('change', ()=>{ OB.holyBook=bookSel.value; });
   const pickOne = (id, set)=>{ const el=document.getElementById(id); if(!el) return;
     el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{ set(b.dataset.v); render(); }); };
-  pickOne('ob-divine', v=>{ OB.divineName=v; OB.divineCustom=''; });
-  pickOne('ob-pron', v=>OB.divinePronoun=v);
   pickOne('ob-season', v=>OB.season=v);
   const pickMany = (id, arr)=>{ const el=document.getElementById(id); if(!el) return;
     el.querySelectorAll('.opt-card').forEach(b=>b.onclick=()=>{
@@ -1040,6 +1060,8 @@ function wireOnboarding(){
       if(i>-1) arr.splice(i,1); else arr.push(v);
       render();
     }); };
+  pickMany('ob-divine', OB.divineNames);
+  pickMany('ob-pron', OB.divinePronouns);
   pickMany('ob-lens', OB.lenses);
   pickMany('ob-rel', OB.relational);
   pickMany('ob-gifts', OB.gifts);
@@ -1056,8 +1078,10 @@ function wireOnboarding(){
     if(obStep < 6){ obStep++; render(); return; }
     S.user = {...S.user,
       soulName: OB.soulName.trim(),
-      divineName: OB.divineCustom.trim() || OB.divineName,
-      divinePronoun: OB.divinePronoun || 'none',
+      divineNames: (()=>{ const a = OB.divineNames.slice(); const c = OB.divineCustom.trim(); if(c && !a.includes(c)) a.push(c); return a.length ? a : ['The Divine']; })(),
+      divinePronouns: OB.divinePronouns.length ? OB.divinePronouns.slice() : ['none'],
+      divineName: OB.divineNames[0] || OB.divineCustom.trim() || 'The Divine',
+      divinePronoun: OB.divinePronouns[0] || 'none',
       lens: obPrimaryLens(),
       lenses: OB.lenses.length ? OB.lenses.slice() : ['Universal'],
       customLens: OB.customLens.trim(),
@@ -1941,8 +1965,8 @@ function viewSoul(){
       <div class="glass" style="border-radius:22px;overflow:hidden">
         ${soulRow('language','App Language', S.lang==='es'?'Español':'English', 'editLang()')}
         ${soulRow('translate','Wisdom lens', u.lens, 'editLens()')}
-        ${soulRow('flare','Name for the sacred', u.divineName, 'editDivine()')}
-        ${soulRow('record_voice_over','How you refer to the sacred', (DEITY_PRONOUNS.find(pr=>pr.k===(u.divinePronoun||'none'))||DEITY_PRONOUNS[0]).label, 'editPronoun()')}
+        ${soulRow('flare','Names for the sacred', esc(divineList().join(' · ')), 'editDivine()')}
+        ${soulRow('record_voice_over','How you refer to the sacred', pronounList().map(k=>(DEITY_PRONOUNS.find(pr=>pr.k===k)||{label:k}).label).join(' · '), 'editPronoun()')}
         ${soulRow('auto_awesome','Your gifts', (u.gifts||[]).length? u.gifts.length+' chosen · tap to change' : 'Choose as many as resonate', 'editGifts()')}
         ${soulRow('tune','Comfort matrix', 'Adjust what Selah shows', 'editComfort()')}
         ${soulRow('menu_book','Sacred text', esc(userBook()), 'editBook()')}
@@ -1996,13 +2020,41 @@ function toggleLens(l){
   save(); editLens();
 }
 function editDivine(){
-  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Name for the Sacred</h2>
-    ${DIVINE_NAMES.map(d=>`<button class="opt-card ${S.user.divineName===d?'on':''}" onclick="S.user.divineName='${d}';save();closeModal();render()"><span class="material-symbols-outlined">flare</span>${d}</button>`).join('')}`);
+  const list = divineList();
+  const extras = list.filter(d=>!DIVINE_NAMES.includes(d));
+  openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Names for the Sacred</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose every name you use — the first one is the name Selah leads with. Tap a selected one to remove it.</p>
+    ${DIVINE_NAMES.concat(extras).map(d=>{const i=list.indexOf(d);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleDivineName(${JSON.stringify(d).replace(/"/g,'&quot;')})"><span class="material-symbols-outlined">flare</span><span style="flex:1">${esc(d)}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
+    <label class="field-label" style="margin-top:10px">Add your own (optional)</label>
+    <input id="divine-custom-edit" placeholder="Write it here…">
+    <button class="grad-btn" style="margin-top:14px" onclick="addCustomDivine()">Done</button>`);
+}
+function toggleDivineName(d){
+  if(!Array.isArray(S.user.divineNames) || !S.user.divineNames.length) S.user.divineNames = [S.user.divineName || 'The Divine'];
+  const i = S.user.divineNames.indexOf(d);
+  if(i>-1){ if(S.user.divineNames.length>1) S.user.divineNames.splice(i,1); }
+  else S.user.divineNames.push(d);
+  syncDivine(); save(); editDivine();
+}
+function addCustomDivine(){
+  const el = document.getElementById('divine-custom-edit');
+  const v = el ? el.value.trim() : '';
+  if(v && !S.user.divineNames.includes(v)) S.user.divineNames.push(v);
+  syncDivine(); save(); closeModal(); render();
 }
 function editPronoun(){
+  const list = pronounList();
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">How You Refer to the Sacred</h2>
-    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Some people say He, some say She or They, and some simply use the name itself. Selah follows your lead everywhere, including how your gifts are named.</p>
-    ${DEITY_PRONOUNS.map(pr=>`<button class="opt-card ${(S.user.divinePronoun||'none')===pr.k?'on':''}" onclick="S.user.divinePronoun='${pr.k}';save();closeModal();render()"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span></button>`).join('')}`);
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose all that fit — some people mix He and They, or sometimes just use the name itself. The first one leads, and Selah follows everywhere, including how your gifts are named. Tap a selected one to remove it.</p>
+    ${DEITY_PRONOUNS.map(pr=>{const i=list.indexOf(pr.k);return `<button class="opt-card ${i>-1?'on':''}" onclick="toggleDivinePronoun('${pr.k}')"><span class="material-symbols-outlined">record_voice_over</span><span style="flex:1">${pr.label}${pr.sub?`<small>${pr.sub}</small>`:''}</span>${i===0?'<span class="chip" style="font-size:8px">Primary</span>':''}</button>`;}).join('')}
+    <button class="grad-btn" style="margin-top:14px" onclick="closeModal();render()">Done</button>`);
+}
+function toggleDivinePronoun(k){
+  if(!Array.isArray(S.user.divinePronouns) || !S.user.divinePronouns.length) S.user.divinePronouns = [S.user.divinePronoun || 'none'];
+  const i = S.user.divinePronouns.indexOf(k);
+  if(i>-1){ if(S.user.divinePronouns.length>1) S.user.divinePronouns.splice(i,1); }
+  else S.user.divinePronouns.push(k);
+  syncDivine(); save(); editPronoun();
 }
 function editGifts(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Gifts</h2>
@@ -2181,6 +2233,7 @@ const BK = {
       user: {
         name: S.user.soulName, lens: lensLabel(S.user.lens), lenses: (S.user.lenses||[S.user.lens]).map(lensLabel),
         custom_lens: S.user.customLens||null, divine_name: S.user.divineName,
+        divine_names: divineList(), divine_pronouns: pronounList(),
         divine_pronoun: S.user.divinePronoun||'none',
         holy_book: userBook(),
         season: S.user.season ? seasonLabel(S.user.season) : null,
