@@ -795,6 +795,11 @@ const ES = {
   'Nothing Has to Be Decided Today':'Nada Tiene Que Decidirse Hoy',
   'That is completely okay — many people discover how insight reaches them slowly, through living and journaling. Keep writing your moments, and patterns will start to show themselves. You can retake this or choose gifts by hand anytime from your profile.':'Est\u00e1 completamente bien — muchas personas descubren poco a poco c\u00f3mo les llega la percepci\u00f3n, viviendo y escribiendo. Sigue registrando tus momentos y los patrones empezar\u00e1n a mostrarse. Puedes repetir esto o elegir tus dones a mano desde tu perfil cuando quieras.',
   'Sounds Good':'Me Parece Bien',
+  'Community':'Comunidad','Your Photo':'Tu Foto','Profile photo':'Foto de perfil',
+  'Add a photo so your shared posts feel like you. It stays in your space and only appears where you choose to share.':'A\u00f1ade una foto para que tus publicaciones se sientan tuyas. Se queda en tu espacio y solo aparece donde t\u00fa decidas compartir.',
+  'Add a photo':'A\u00f1adir una foto','Change photo':'Cambiar foto','Remove photo':'Quitar foto',
+  'Added · tap to change':'A\u00f1adida · toca para cambiar','Add one if you like':'A\u00f1ade una si quieres',
+  'Photo added.':'Foto a\u00f1adida.','Photo removed.':'Foto quitada.',
   'Added. Your gifts are yours to refine anytime.':'A\u00f1adidos. Tus dones son tuyos y puedes afinarlos cuando quieras.',
   'preview during testing':'vista previa durante las pruebas','Sample post':'Publicaci\u00f3n de muestra',
   'Got It':'Entendido',
@@ -936,11 +941,11 @@ function canDiscern(){
 
 /* ---------- seed pulse data ---------- */
 const SEED_PULSE = [
-  {id:'p1', name:'Aaliyah Grace', where:'Kenya', when:'Active 2m ago', cat:'Healing', kind:'intention', text:'Lifting up my grandmother who is walking through a hard season. Asking for wisdom for those caring for her.', acts:212},
-  {id:'p2', name:'Mateo Rivera', where:'Mexico City', when:'Active 15m ago', cat:'Clarity', kind:'intention', text:'Searching for the right path in my career transition. Seeking a peace that goes deeper than circumstances.', acts:147},
-  {id:'p3', name:'Chen Wei', where:'Singapore', when:'Shared 1h ago', cat:'Victory', kind:'victory', text:'Found my lost son today after three days of searching. Thank you to everyone who held us in light. The strength of this community is real.', acts:894},
-  {id:'p4', name:'Imani Okafor', where:'Lagos', when:'Shared 3h ago', cat:'Provision', kind:'victory', text:'The contract came through this morning, right when the account hit empty. Grateful beyond words.', acts:301},
-  {id:'p5', name:'Sarah Kim', where:'Seoul', when:'Active 26m ago', cat:'Peace', kind:'intention', text:'Sitting with a big decision about family. Holding space for a soft heart and a clear mind.', acts:88}
+  {id:'p1', name:'Aaliyah Grace', ava:'spa', where:'Kenya', when:'Active 2m ago', cat:'Healing', kind:'intention', text:'Lifting up my grandmother who is walking through a hard season. Asking for wisdom for those caring for her.', acts:212},
+  {id:'p2', name:'Mateo Rivera', ava:'explore', where:'Mexico City', when:'Active 15m ago', cat:'Clarity', kind:'intention', text:'Searching for the right path in my career transition. Seeking a peace that goes deeper than circumstances.', acts:147},
+  {id:'p3', name:'Chen Wei', ava:'star', where:'Singapore', when:'Shared 1h ago', cat:'Victory', kind:'victory', text:'Found my lost son today after three days of searching. Thank you to everyone who held us in light. The strength of this community is real.', acts:894},
+  {id:'p4', name:'Imani Okafor', ava:'wb_sunny', where:'Lagos', when:'Shared 3h ago', cat:'Provision', kind:'victory', text:'The contract came through this morning, right when the account hit empty. Grateful beyond words.', acts:301},
+  {id:'p5', name:'Sarah Kim', ava:'self_improvement', where:'Seoul', when:'Active 26m ago', cat:'Peace', kind:'intention', text:'Sitting with a big decision about family. Holding space for a soft heart and a clear mind.', acts:88}
 ];
 if(!S.pulse.length){ S.pulse = SEED_PULSE.slice(); save(); }
 </script>
@@ -957,13 +962,13 @@ function appHeader(title, accent, sub){
       <div><div class="b-title">${title} ${accent?`<span class="accent-p">${accent}</span>`:''}</div>
       <div class="b-sub">${sub||'PAUSE • REFLECT • DISCERN'}</div></div>
     </div>
-    <button class="avatar-btn" onclick="go('soul')">${initialOf()}</button>
+    <button class="avatar-btn" onclick="go('soul')" style="overflow:hidden;padding:0">${S.user.photo?`<img src="${S.user.photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:initialOf()}</button>
   </header>`;
 }
 function navBar(active){
   const items = [
     ['home','grid_view','Home'],['space','self_improvement','Rituals'],
-    ['FAB'],['pulse','radio_button_checked','Together'],['soul','person','Profile']
+    ['FAB'],['pulse','radio_button_checked','Community'],['soul','person','Profile']
   ];
   return `<nav id="bottom-nav" class="visible">` + items.map(it=>{
     if(it[0]==='FAB') return `<button class="fab" onclick="go('journal')" aria-label="New Selah Moment"><span class="material-symbols-outlined" style="font-size:32px">add</span></button>`;
@@ -987,7 +992,7 @@ function render(arg){
     ritual:viewRitualLog, vault:viewVaultPin, vaultlist:viewVaultList, moments:viewMoments};
   const fn = views[route] || viewHome;
   app.innerHTML = fn(arg);
-  const wires = {journal:wireJournal, vault:wireVaultPin, ritual:wireRitual, library:wireLibrary};
+  const wires = {journal:wireJournal, vault:wireVaultPin, ritual:wireRitual, library:wireLibrary, pulse:wirePulse};
   if(wires[route]) wires[route](arg);
   translateDOM(app);
 }
@@ -1823,6 +1828,123 @@ function wireLibrary(){
 </script>
 <script>
 /* ================= COLLECTIVE PULSE ================= */
+/* ---------- WebGL rotating earth (true 3D sphere; CSS pan as fallback) ---------- */
+let _earthRAF = 0;
+function wirePulse(){ initEarthGL(); }
+function _earthFallback(){
+  const c = document.getElementById('earth-gl');
+  const f = document.getElementById('earth-fallback');
+  if(c) c.style.display = 'none';
+  if(f) f.style.display = 'block';
+}
+function initEarthGL(){
+  cancelAnimationFrame(_earthRAF);
+  const canvas = document.getElementById('earth-gl');
+  if(!canvas) return;
+  let gl = null;
+  try{ gl = canvas.getContext('webgl', {antialias:true, alpha:true}) || canvas.getContext('experimental-webgl'); }catch(e){}
+  if(!gl){ _earthFallback(); return; }
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = 190 * dpr; canvas.height = 190 * dpr;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+  const vs = 'attribute vec3 aPos; attribute vec2 aUV; uniform mat4 uM; uniform mat4 uP;' +
+    'varying vec2 vUV; varying vec3 vN;' +
+    'void main(){ vec4 w = uM * vec4(aPos,1.0); vN = normalize((uM * vec4(aPos,0.0)).xyz); vUV = aUV; gl_Position = uP * w; }';
+  const fs = 'precision mediump float; varying vec2 vUV; varying vec3 vN; uniform sampler2D uTex;' +
+    'void main(){' +
+    ' vec3 N = normalize(vN); vec3 V = vec3(0.0,0.0,1.0); vec3 L = normalize(vec3(-0.45,0.55,0.75));' +
+    ' float diff = max(dot(N,L),0.0)*0.7 + 0.4;' +
+    ' vec3 col = texture2D(uTex, vUV).rgb * diff;' +
+    ' float fres = pow(1.0 - max(dot(N,V),0.0), 2.3);' +
+    ' vec3 rim = mix(vec3(0.075,0.93,0.78), vec3(0.75,0.38,1.0), clamp(N.x*0.6+0.5,0.0,1.0));' +
+    ' col += rim * fres * 0.5;' +
+    ' gl_FragColor = vec4(col, 1.0); }';
+  const mk = (t, s)=>{ const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, mk(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){ _earthFallback(); return; }
+  gl.useProgram(prog);
+
+  const LA = 48, LO = 72, pos = [], uv = [], idx = [];
+  for(let i = 0; i <= LA; i++){
+    const th = i / LA * Math.PI, sT = Math.sin(th), cT = Math.cos(th);
+    for(let j = 0; j <= LO; j++){
+      const ph = j / LO * 2 * Math.PI - Math.PI;
+      pos.push(sT * Math.sin(ph), cT, sT * Math.cos(ph));
+      uv.push(j / LO, i / LA);
+    }
+  }
+  for(let i = 0; i < LA; i++) for(let j = 0; j < LO; j++){
+    const a = i * (LO + 1) + j, b = a + LO + 1;
+    idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const buf = (target, data)=>{ const o = gl.createBuffer(); gl.bindBuffer(target, o); gl.bufferData(target, data, gl.STATIC_DRAW); return o; };
+  buf(gl.ARRAY_BUFFER, new Float32Array(pos));
+  const aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+  buf(gl.ARRAY_BUFFER, new Float32Array(uv));
+  const aUV = gl.getAttribLocation(prog, 'aUV');
+  gl.enableVertexAttribArray(aUV); gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0);
+  buf(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idx));
+  const nIdx = idx.length;
+
+  const uM = gl.getUniformLocation(prog, 'uM');
+  const uP = gl.getUniformLocation(prog, 'uP');
+  const f = 1 / Math.tan(16 * Math.PI / 180);
+  const near = 0.1, far = 10;
+  const P = new Float32Array([f,0,0,0, 0,f,0,0, 0,0,(far+near)/(near-far),-1, 0,0,2*far*near/(near-far),0]);
+  gl.uniformMatrix4fv(uP, false, P);
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0, 0, 0, 0);
+
+  const tex = gl.createTexture();
+  const img = new Image();
+  let texReady = false;
+  img.onload = ()=>{
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    texReady = true;
+  };
+  img.onerror = _earthFallback;
+  img.src = EARTHMAP;
+
+  const a0 = 98 * Math.PI / 180;      /* North America faces you first */
+  const w = 2 * Math.PI / 48;         /* one revolution every 48s */
+  const tilt = -0.14;                 /* gentle axial tilt */
+  const d = -3.55;
+  function draw(a){
+    const cy = Math.cos(a), sy = Math.sin(a), cx = Math.cos(tilt), sx = Math.sin(tilt);
+    /* M = T(0,0,d) * Rx(tilt) * Ry(a), column-major */
+    const M = new Float32Array([
+      cy,        sx*sy,      -cx*sy,     0,
+      0,         cx,          sx,        0,
+      sy,       -sx*cy,       cx*cy,     0,
+      0,         0,           d,         1
+    ]);
+    gl.uniformMatrix4fv(uM, false, M);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    if(texReady) gl.drawElements(gl.TRIANGLES, nIdx, gl.UNSIGNED_SHORT, 0);
+  }
+  const still = ()=> document.body.classList.contains('calm') ||
+    (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  let t0 = null;
+  function frame(t){
+    if(!canvas.isConnected) return;
+    if(t0 === null) t0 = t;
+    draw(a0 - w * (t - t0) / 1000);
+    if(still()){ draw(a0); return; }
+    _earthRAF = requestAnimationFrame(frame);
+  }
+  _earthRAF = requestAnimationFrame(frame);
+}
+
 let pulseTab = 'intention';
 function globalPatterns(){
   const tally = {};
@@ -1844,7 +1966,8 @@ function viewPulse(){
         <div style="position:absolute;left:49px;top:32px;width:190px;height:190px">
           <div style="position:absolute;inset:-18px;border-radius:50%;background:rgba(43,238,227,.09);filter:blur(28px)"></div>
           <div style="position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;background:#04090b">
-            <div class="earth-spin" style="background-image:url(${EARTHMAP})"></div>
+            <canvas id="earth-gl" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+          <div class="earth-spin" id="earth-fallback" style="background-image:url(${EARTHMAP});display:none"></div>
             <div style="position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 42% 30%, rgba(255,255,255,.09), transparent 42%), linear-gradient(205deg, rgba(3,5,9,.55), transparent 48%), radial-gradient(circle at 50% 50%, transparent 48%, rgba(2,4,7,.94) 99%)"></div>
           </div>
           <div style="position:absolute;inset:-3px;border-radius:50%;pointer-events:none;box-shadow:-10px 14px 30px -8px rgba(43,238,227,.6), inset -7px 9px 20px -9px rgba(43,238,227,.55), 12px -6px 30px -12px rgba(207,123,255,.45), inset 8px -6px 18px -10px rgba(207,123,255,.4)"></div>
@@ -1875,7 +1998,7 @@ function viewPulse(){
       return `<div class="glass pulse-card">
       <div class="pulse-head">
         <div style="display:flex;align-items:center;gap:13px">
-          <div class="pulse-ava">${esc(p.name.charAt(0))}</div>
+          <div class="pulse-ava" style="overflow:hidden">${p.photo?`<img src="${p.photo}" alt="" style="width:100%;height:100%;object-fit:cover">`:p.ava?`<span class="material-symbols-outlined" style="font-size:20px;color:rgba(255,255,255,.85)">${p.ava}</span>`:esc(p.name.charAt(0))}</div>
           <div><div style="font-size:15px;font-weight:700">${esc(p.name)}</div>
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:${p.kind==='victory'?'#bf61ff':'rgba(43,238,227,.7)'}">${esc(p.where)}${p.when?' \u2022 '+esc(p.when):''}</div></div>
         </div>
@@ -1911,7 +2034,7 @@ function publishTestimony(){
   const t = document.getElementById('tm-text').value.trim();
   if(!t){ toast('Write what happened first.'); return; }
   const cat = document.getElementById('tm-cat').value;
-  const post = {id:'u'+Date.now(), name:S.user.soulName||'A friend', where:'You', cat, kind:'victory', text:t, acts:0};
+  const post = {id:'u'+Date.now(), name:S.user.soulName||'A friend', photo:S.user.photo||null, where:'You', cat, kind:'victory', text:t, acts:0};
   S.pulse.unshift(post);
   if(window.BK && BK.on) BK.pushPulse(post);
   save(); closeModal(); pulseTab='victory'; go('pulse');
@@ -1921,7 +2044,7 @@ function publishTestimony(){
 /* ================= PETITIONS + VICTORIES ================= */
 function viewPetitions(){
   const list = S.petitions.filter(p=>!p.answered);
-  return appHeader('Selah','Together','Pause, reflect, discern') + `<main class="px" style="padding-top:20px">
+  return appHeader('Selah','Community','Pause, reflect, discern') + `<main class="px" style="padding-top:20px">
     <div class="section-head">
       <h1 class="screen-title">${T('petitionsTitle')}</h1>
       <button class="icon-mini" onclick="go('victories')" title="Victory Wall"><span class="material-symbols-outlined" style="font-size:18px">workspace_premium</span></button>
@@ -1998,7 +2121,7 @@ function viewVictories(){
 }
 function shareWin(id){
   const p = S.petitions.find(x=>x.id===id); if(!p) return;
-  const post = {id:'u'+Date.now(), name:S.user.soulName||'A friend', where:'You', cat:p.cat, kind:'victory', text:p.title + (p.body?' - '+p.body:''), acts:0};
+  const post = {id:'u'+Date.now(), name:S.user.soulName||'A friend', photo:S.user.photo||null, where:'You', cat:p.cat, kind:'victory', text:p.title + (p.body?' - '+p.body:''), acts:0};
   S.pulse.unshift(post);
   if(window.BK && BK.on) BK.pushPulse(post);
   save(); pulseTab='victory'; go('pulse'); toast('Shared. Let them celebrate with you.');
@@ -2135,7 +2258,10 @@ function viewSoul(){
   const u = S.user;
   return appHeader('Your','Profile','Settings and preferences') + `<main class="px" style="padding-top:22px">
     <section class="section" style="text-align:center">
-      <div style="width:86px;height:86px;border-radius:50%;margin:0 auto 14px;background:linear-gradient(135deg,var(--primary),var(--teal));display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;box-shadow:0 0 34px rgba(173,43,238,.4)">${initialOf()}</div>
+      <div style="position:relative;width:86px;height:86px;margin:0 auto 14px;cursor:pointer" onclick="openPhotoModal()">
+        <div style="width:86px;height:86px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--primary),var(--teal));display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;box-shadow:0 0 34px rgba(173,43,238,.4)">${u.photo?`<img src="${u.photo}" alt="" style="width:100%;height:100%;object-fit:cover">`:initialOf()}</div>
+        <div style="position:absolute;bottom:-2px;right:-2px;width:28px;height:28px;border-radius:50%;background:rgba(12,15,20,.95);border:1px solid rgba(43,238,227,.4);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:15px;color:var(--teal)">photo_camera</span></div>
+      </div>
       <h1 style="font-size:24px;font-weight:700">${esc(u.soulName)}</h1>
       <p style="font-size:12px;color:var(--ink-40);margin-top:4px">${esc(S.auth.contact)}</p>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
@@ -2152,6 +2278,7 @@ function viewSoul(){
     <section class="section">
       <div class="section-head"><span class="eyebrow">Settings</span></div>
       <div class="glass" style="border-radius:22px;overflow:hidden">
+        ${soulRow('add_a_photo','Profile photo', u.photo?'Added · tap to change':'Add one if you like', 'openPhotoModal()')}
         ${soulRow('language','App Language', S.lang==='es'?'Español':'English', 'editLang()')}
         ${soulRow('translate','Wisdom lens', u.lens, 'editLens()')}
         ${soulRow('flare','Names for the sacred', esc(divineList().join(' · ')), 'editDivine()')}
@@ -2174,6 +2301,31 @@ function viewSoul(){
       <button class="ghost-btn" style="color:var(--danger);border-color:rgba(255,93,122,.3)" onclick="signOut()"><span class="material-symbols-outlined" style="font-size:18px">logout</span>Sign out</button>
     </section>
   </main>` + navBar('soul');
+}
+function openPhotoModal(){
+  openModal(`
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Photo</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Add a photo so your shared posts feel like you. It stays in your space and only appears where you choose to share.</p>
+    <input type="file" id="pf-photo" accept="image/*" style="display:none">
+    <button class="opt-card" onclick="document.getElementById('pf-photo').click()"><span class="material-symbols-outlined">add_a_photo</span>${S.user.photo?'Change photo':'Add a photo'}</button>
+    ${S.user.photo?`<button class="opt-card" onclick="S.user.photo=null;save();closeModal();render();toast('Photo removed.')"><span class="material-symbols-outlined">delete</span>Remove photo</button>`:''}
+  `);
+  const inp = document.getElementById('pf-photo');
+  if(inp) inp.onchange = ()=>{
+    const f = inp.files && inp.files[0]; if(!f) return;
+    const img = new Image();
+    const url = URL.createObjectURL(f);
+    img.onload = ()=>{
+      const s = Math.min(img.width, img.height);
+      const c = document.createElement('canvas'); c.width = c.height = 256;
+      c.getContext('2d').drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 256, 256);
+      S.user.photo = c.toDataURL('image/jpeg', .85);
+      URL.revokeObjectURL(url);
+      save(); closeModal(); render(); toast('Photo added.');
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); toast('That image could not be read. Try another one.'); };
+    img.src = url;
+  };
 }
 function editLang(){
   openModal(`
