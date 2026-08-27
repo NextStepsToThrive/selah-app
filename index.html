@@ -492,6 +492,88 @@ function T(key){
 }
 
 /* ---------- clairs ---------- */
+/* ---------- gift discovery quiz (tradition-neutral, experience-based) ---------- */
+const GIFT_QUIZ = [
+  {k:'Clairvoyance', q:'Pictures or scenes appear in my mind — while praying, meditating, or out of nowhere — and they turn out to mean something.'},
+  {k:'Clairaudience', q:'I sometimes hear an inner word, name, or phrase, clearer and quieter than my own thoughts.'},
+  {k:'Clairsentience', q:'My gut warns me about people or situations before I have any facts to go on.'},
+  {k:'Clairempathy', q:'I pick up other people\u2019s moods so strongly it can feel like they are my own.'},
+  {k:'Claircognizance', q:'I simply know things — who is calling, what is about to happen — without knowing how I know.'},
+  {k:'Clairgustance', q:'I have tasted something with no physical source, like a food tied to a person or memory.'},
+  {k:'Clairsalience', q:'I have smelled perfume, smoke, or flowers when nothing around me could explain it.'},
+  {k:'Clairtangency', q:'Holding an object or walking into a place, I sometimes sense its story or its feeling.'},
+  {k:'D\u00e9j\u00e0 Vu', q:'I often get the strong sense that this exact moment has happened before.'},
+  {k:'D\u00e9j\u00e0 R\u00eav\u00e9', q:'Things I dream sometimes happen later, or I recognize a waking moment from a dream.'}
+];
+let GQ = null;
+function startGiftQuiz(target){
+  GQ = { i:0, scores:{}, target: target || 'profile' };
+  renderGiftQuiz();
+}
+function renderGiftQuiz(){
+  const total = GIFT_QUIZ.length;
+  if(GQ.i < total){
+    const item = GIFT_QUIZ[GQ.i];
+    openModal(`
+      <span class="eyebrow" style="color:var(--teal)">Discovering your gifts \u00b7 ${GQ.i+1} of ${total}</span>
+      <h2 style="font-size:17px;font-weight:600;margin:12px 0 6px;line-height:1.55">${item.q}</h2>
+      <p style="font-size:11px;color:var(--ink-40);margin-bottom:16px">There are no wrong answers. Go with your first instinct.</p>
+      <button class="opt-card" onclick="answerGiftQuiz(2)"><span class="material-symbols-outlined">check_circle</span>Often, yes</button>
+      <button class="opt-card" onclick="answerGiftQuiz(1)"><span class="material-symbols-outlined">contrast</span>Sometimes</button>
+      <button class="opt-card" onclick="answerGiftQuiz(0)"><span class="material-symbols-outlined">circle</span>Not really</button>
+      <button style="background:none;border:none;color:var(--ink-40);margin-top:12px;cursor:pointer;font-size:12px;width:100%" onclick="closeModal()">Finish later</button>
+    `);
+    return;
+  }
+  GQ.strong = GIFT_QUIZ.filter(x=>GQ.scores[x.k]===2).map(x=>x.k);
+  GQ.some = GIFT_QUIZ.filter(x=>GQ.scores[x.k]===1).map(x=>x.k);
+  GQ.picked = GQ.strong.slice();
+  renderGiftQuizResults();
+}
+function answerGiftQuiz(v){ GQ.scores[GIFT_QUIZ[GQ.i].k] = v; GQ.i++; renderGiftQuiz(); }
+function renderGiftQuizResults(){
+  const qLens = (GQ.target==='ob' && !S.onboarded && typeof obPrimaryLens==='function') ? obPrimaryLens() : undefined;
+  const card = (k, note)=>{
+    const on = GQ.picked.includes(k);
+    const info = CLAIR_INFO[k];
+    const icon = (CLAIRS.find(c=>c.k===k)||{}).icon || 'auto_awesome';
+    return `<button class="opt-card ${on?'on':''}" onclick="toggleQuizPick('${k.replace(/'/g,"\\'")}')"><span class="material-symbols-outlined">${icon}</span><span style="flex:1">${giftLabel(k, qLens)}<small>${note}${info?' \u00b7 '+info.desc:''}</small></span></button>`;
+  };
+  if(!GQ.strong.length && !GQ.some.length){
+    openModal(`
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Nothing Has to Be Decided Today</h2>
+      <p style="font-size:13px;color:var(--ink-50);line-height:1.7;margin-bottom:18px">That is completely okay — many people discover how insight reaches them slowly, through living and journaling. Keep writing your moments, and patterns will start to show themselves. You can retake this or choose gifts by hand anytime from your profile.</p>
+      <button class="grad-btn" onclick="closeModal();render()">Sounds Good</button>
+    `);
+    return;
+  }
+  openModal(`
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">What Resonated</h2>
+    <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Based on your answers, these may be how insight reaches you — named in your own tradition\u2019s language. You decide: tap to keep or remove any of them.</p>
+    ${GQ.strong.map(k=>card(k,'Resonated strongly')).join('')}
+    ${GQ.some.map(k=>card(k,'Sometimes resonates')).join('')}
+    <button class="grad-btn" style="margin-top:14px" onclick="applyGiftQuiz()">Keep the Selected Ones</button>
+  `);
+}
+function toggleQuizPick(k){
+  const i = GQ.picked.indexOf(k);
+  if(i>-1) GQ.picked.splice(i,1); else GQ.picked.push(k);
+  renderGiftQuizResults();
+}
+function applyGiftQuiz(){
+  if(GQ.target==='ob' && typeof OB !== 'undefined' && !S.onboarded){
+    GQ.picked.forEach(k=>{ if(!OB.gifts.includes(k)) OB.gifts.push(k); });
+  } else {
+    S.user.gifts = S.user.gifts || [];
+    GQ.picked.forEach(k=>{ if(!S.user.gifts.includes(k)) S.user.gifts.push(k); });
+    save();
+  }
+  const n = GQ.picked.length;
+  GQ = null;
+  closeModal(); render();
+  if(n) toast('Added. Your gifts are yours to refine anytime.');
+}
+
 const CLAIRS = [
   {k:'Clairvoyance', icon:'visibility'},{k:'Clairaudience', icon:'hearing'},
   {k:'Clairsentience', icon:'touch_app'},{k:'Clairempathy', icon:'favorite'},
@@ -684,7 +766,28 @@ const ES = {
   'Choose all that fit — some people mix He and They, or sometimes just use the name. Selah follows your lead.':'Elige todos los que encajen — algunas personas mezclan Él y Elle, o a veces solo usan el nombre. Selah sigue tu ejemplo.',
   'Add your own (optional)':'Añade el tuyo (opcional)','Write it here…':'Escríbelo aquí…',
   'Prefer an order? Drag to rearrange · optional':'¿Prefieres un orden? Arrastra para reorganizar · opcional',
-  'Done':'Listo'
+  'Done':'Listo',
+  'Not Sure Yet? Take a Short Discovery Quiz':'\u00bfA\u00fan no sabes? Haz un breve cuestionario de descubrimiento',
+  'There are no wrong answers. Go with your first instinct.':'No hay respuestas incorrectas. Sigue tu primer instinto.',
+  'Often, yes':'A menudo, s\u00ed','Sometimes':'A veces','Not really':'La verdad, no','Finish later':'Terminar luego',
+  'What Resonated':'Lo Que Reson\u00f3',
+  'Based on your answers, these may be how insight reaches you — named in your own tradition\u2019s language. You decide: tap to keep or remove any of them.':'Seg\u00fan tus respuestas, as\u00ed puede llegarte la percepci\u00f3n — nombrada en el lenguaje de tu tradici\u00f3n. T\u00fa decides: toca para conservar o quitar cualquiera.',
+  'Resonated strongly':'Reson\u00f3 con fuerza','Sometimes resonates':'Resuena a veces',
+  'Keep the Selected Ones':'Conservar los Seleccionados',
+  'Nothing Has to Be Decided Today':'Nada Tiene Que Decidirse Hoy',
+  'That is completely okay — many people discover how insight reaches them slowly, through living and journaling. Keep writing your moments, and patterns will start to show themselves. You can retake this or choose gifts by hand anytime from your profile.':'Est\u00e1 completamente bien — muchas personas descubren poco a poco c\u00f3mo les llega la percepci\u00f3n, viviendo y escribiendo. Sigue registrando tus momentos y los patrones empezar\u00e1n a mostrarse. Puedes repetir esto o elegir tus dones a mano desde tu perfil cuando quieras.',
+  'Sounds Good':'Me Parece Bien',
+  'Added. Your gifts are yours to refine anytime.':'A\u00f1adidos. Tus dones son tuyos y puedes afinarlos cuando quieras.',
+  'Pictures or scenes appear in my mind — while praying, meditating, or out of nowhere — and they turn out to mean something.':'Aparecen im\u00e1genes o escenas en mi mente — orando, meditando o de la nada — y resultan significar algo.',
+  'I sometimes hear an inner word, name, or phrase, clearer and quieter than my own thoughts.':'A veces escucho una palabra, un nombre o una frase interior, m\u00e1s clara y silenciosa que mis propios pensamientos.',
+  'My gut warns me about people or situations before I have any facts to go on.':'Mi instinto me advierte sobre personas o situaciones antes de tener ning\u00fan dato.',
+  'I pick up other people\u2019s moods so strongly it can feel like they are my own.':'Percibo los estados de \u00e1nimo de otras personas con tanta fuerza que pueden sentirse como m\u00edos.',
+  'I simply know things — who is calling, what is about to happen — without knowing how I know.':'Simplemente s\u00e9 cosas — qui\u00e9n llama, qu\u00e9 est\u00e1 por pasar — sin saber c\u00f3mo lo s\u00e9.',
+  'I have tasted something with no physical source, like a food tied to a person or memory.':'He saboreado algo sin fuente f\u00edsica, como una comida ligada a una persona o un recuerdo.',
+  'I have smelled perfume, smoke, or flowers when nothing around me could explain it.':'He olido perfume, humo o flores cuando nada a mi alrededor pod\u00eda explicarlo.',
+  'Holding an object or walking into a place, I sometimes sense its story or its feeling.':'Al sostener un objeto o entrar en un lugar, a veces percibo su historia o su sentir.',
+  'I often get the strong sense that this exact moment has happened before.':'A menudo tengo la fuerte sensaci\u00f3n de que este momento exacto ya sucedi\u00f3 antes.',
+  'Things I dream sometimes happen later, or I recognize a waking moment from a dream.':'Cosas que sue\u00f1o a veces suceden despu\u00e9s, o reconozco un momento despierto de un sue\u00f1o.'
 };
 const ES_RX = [
   [/^(\d+) Answered$/, '$1 Respondidas'],
@@ -695,7 +798,8 @@ const ES_RX = [
   [/^Getting to know you · Step (\d+) of 7$/, 'Conociéndote · Paso $1 de 7'],
   [/^Unlimited (.+)s · Pro included free during testing$/, '$1 sin límite · Pro incluido gratis durante las pruebas'],
   [/^How do you refer to (.+)\?$/, '¿Cómo te refieres a $1?'],
-  [/^(\d+) chosen · tap to change$/, '$1 elegidos · toca para cambiar']
+  [/^(\d+) chosen · tap to change$/, '$1 elegidos · toca para cambiar'],
+  [/^Discovering your gifts · (\d+) of (\d+)$/, 'Descubriendo tus dones · $1 de $2']
 ];
 function LT(t){
   if(S.lang!=='es' || !t) return t;
@@ -1046,7 +1150,8 @@ function viewOnboarding(){
     const lens = obPrimaryLens();
     return obShell(`
       <h1 class="screen-title" style="margin-bottom:6px">How insight reaches you</h1>
-      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:20px">People sense things in different ways. Choose every one that resonates; skip any that do not. Each card explains what it means.</p>
+      <p style="color:var(--ink-50);font-size:14px;line-height:1.6;margin-bottom:14px">People sense things in different ways. Choose every one that resonates; skip any that do not. Each card explains what it means.</p>
+      <button class="ghost-btn" style="width:100%;padding:14px;margin-bottom:16px;font-size:13px" onclick="startGiftQuiz('ob')"><span class="material-symbols-outlined" style="font-size:18px">explore</span>Not Sure Yet? Take a Short Discovery Quiz</button>
       <div id="ob-gifts">${CLAIRS.map(c=>{const lbl=giftLabel(c.k, lens);const info=CLAIR_INFO[c.k];return `<button class="opt-card ${u.gifts.includes(c.k)?'on':''}" data-v="${c.k}"><span class="material-symbols-outlined">${c.icon}</span><span style="flex:1">${lbl}<small>${info.desc}<br><span style="color:rgba(43,238,227,.6)">Also called: ${info.syn}${lbl!==c.k?', '+c.k.toLowerCase():''}</span></small></span></button>`;}).join('')}</div>
     `, true, u.gifts.length? 'Continue' : 'Skip for now');
   }
@@ -2103,6 +2208,7 @@ function toggleDivinePronoun(k){
 function editGifts(){
   openModal(`<h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Your Gifts</h2>
     <p style="font-size:12px;color:var(--ink-50);margin-bottom:16px;line-height:1.6">Choose every one that resonates — there is no limit. Tap a selected one to remove it.</p>
+    <button class="ghost-btn" style="width:100%;padding:12px;margin-bottom:14px;font-size:12px" onclick="startGiftQuiz('profile')"><span class="material-symbols-outlined" style="font-size:16px">explore</span>Not Sure Yet? Take a Short Discovery Quiz</button>
     ${CLAIRS.map(c=>{const on=(S.user.gifts||[]).includes(c.k);const info=CLAIR_INFO[c.k];return `<button class="opt-card ${on?'on':''}" onclick="toggleGift('${c.k}')"><span class="material-symbols-outlined">${c.icon}</span><span style="flex:1">${giftLabel(c.k)}<small>${info.desc}</small></span></button>`;}).join('')}
     <button class="grad-btn" style="margin-top:14px" onclick="closeModal();render()">Done</button>`);
 }
