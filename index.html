@@ -310,10 +310,13 @@ h1.screen-title{font-size:22px;font-weight:700;letter-spacing:-.01em}
 .save-badge{position:absolute;top:-10px;right:14px;background:var(--teal);color:var(--bg-deep);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:4px 10px;border-radius:99px}
 
 /* pulse */
-.pulse-card{border-radius:28px;padding:20px;margin-bottom:16px}
+.pulse-card{border-radius:32px;padding:22px;margin-bottom:18px;background:rgba(15,8,23,.7)}
 .pulse-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
 .pulse-ava{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,rgba(173,43,238,.5),rgba(43,238,227,.4));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;border:2px solid rgba(255,255,255,.12)}
-.sym-circle{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)}
+.sym-circle{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)}
+.sym-circle.hot{border-color:rgba(19,236,200,.4);color:#13ecc8;box-shadow:0 0 20px rgba(19,236,200,.15)}
+.pulse-cta{width:100%;border:none;cursor:pointer;background:linear-gradient(90deg,#8b5cf6 0%,#13ecc8 100%);color:#05070A;font-family:inherit;font-weight:800;text-transform:uppercase;letter-spacing:.2em;font-size:13px;padding:16px;border-radius:16px;box-shadow:0 8px 25px rgba(139,92,246,.3);transition:transform .15s ease}
+.pulse-cta:active{transform:scale(.96)}
 .earth-spin{position:absolute;inset:0;border-radius:50%;background-size:380px 190px;background-repeat:repeat-x;background-position:8px center;animation:earthSpin 48s linear infinite}
 @keyframes earthSpin{from{background-position-x:8px}to{background-position-x:-372px}}
 
@@ -1836,9 +1839,9 @@ function viewPulse(){
   const online = 1148 + (new Date().getHours()*37)%400;
   return appHeader('Collective','Pulse') + `<main class="px" style="padding-top:20px">
     <section class="section" style="text-align:center">
-      <div style="position:relative;width:282px;height:282px;margin:0 auto">
+      <div style="position:relative;width:288px;height:288px;margin:0 auto">
         <div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 36%, #10141a 0%, #080b0f 55%, #05070a 100%);box-shadow:inset 0 0 48px rgba(0,0,0,.8), 0 0 70px rgba(43,238,227,.05)"></div>
-        <div style="position:absolute;left:46px;top:30px;width:190px;height:190px">
+        <div style="position:absolute;left:49px;top:32px;width:190px;height:190px">
           <div style="position:absolute;inset:-18px;border-radius:50%;background:rgba(43,238,227,.09);filter:blur(28px)"></div>
           <div style="position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;background:#04090b">
             <div class="earth-spin" style="background-image:url(${EARTHMAP})"></div>
@@ -1846,15 +1849,15 @@ function viewPulse(){
           </div>
           <div style="position:absolute;inset:-3px;border-radius:50%;pointer-events:none;box-shadow:-10px 14px 30px -8px rgba(43,238,227,.6), inset -7px 9px 20px -9px rgba(43,238,227,.55), 12px -6px 30px -12px rgba(207,123,255,.45), inset 8px -6px 18px -10px rgba(207,123,255,.4)"></div>
         </div>
-        <div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);white-space:nowrap;display:inline-flex;align-items:center;gap:8px;background:rgba(12,15,20,.94);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:11px 20px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.5)"><i style="width:7px;height:7px;border-radius:50%;background:#39e58c;box-shadow:0 0 10px #39e58c"></i>${online.toLocaleString()} People Here Now</div>
+        <div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);white-space:nowrap;display:inline-flex;align-items:center;gap:8px;background:rgba(12,15,20,.94);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:11px 20px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.5)"><i style="width:8px;height:8px;border-radius:50%;background:#13ecc8;box-shadow:0 0 12px #13ecc8;animation:breathe 2s ease-in-out infinite"></i>${online.toLocaleString()} People Here Now</div>
       </div>
     </section>
 
     <section class="section" style="margin-top:30px">
       <div class="section-head"><span class="eyebrow">Global Patterns</span><span style="font-size:9px;color:var(--ink-30)">preview during testing</span></div>
       <div class="pill-row" style="gap:14px">
-        ${pats.map(p=>`<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px">
-          <div class="sym-circle">${p.k==='11:11'?'<span style="font-size:15px;font-weight:800;letter-spacing:-.04em">11:11</span>':`<span class="material-symbols-outlined" style="font-size:26px;font-weight:300">${p.icon}</span>`}</div>
+        ${pats.map((p,pi)=>`<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div class="sym-circle ${pi===0?'hot':''}">${p.k==='11:11'?'<span style="font-size:15px;font-weight:800;letter-spacing:-.04em">11:11</span>':`<span class="material-symbols-outlined" style="font-size:26px;font-weight:300">${p.icon}</span>`}</div>
           <div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.75)">${esc(p.name)}</div>
           <div style="font-size:8px;color:var(--ink-40);margin-top:2px">${p.n.toLocaleString()} People Today</div></div>
         </div>`).join('')}
@@ -1879,10 +1882,10 @@ function viewPulse(){
         <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="chip ${p.kind==='victory'?'purple':'dim'}">${esc(p.cat)}</span>${/^p\d+$/.test(p.id)?'<span style="font-size:8px;color:var(--ink-30);text-transform:uppercase;letter-spacing:.1em">Sample post</span>':''}</span>
       </div>
       <p style="font-size:15px;line-height:1.6;color:rgba(255,255,255,.88);margin-bottom:16px;${p.kind==='intention'?'font-style:italic;font-weight:300':''}">${esc(p.text)}</p>
-      <button class="grad-btn" style="padding:15px;font-size:12px;border-radius:999px;${acted?'opacity:.55':''}" onclick="pulseAct('${p.id}')">${label}</button>
+      <button class="pulse-cta" style="${acted?'opacity:.55':''}" onclick="pulseAct('${p.id}')">${label}</button>
     </div>`;}).join('')}
 
-    <button class="grad-btn" style="margin-top:6px;margin-bottom:30px;padding:19px;border-radius:999px;font-size:13px" onclick="openTestimony()">${T('shareCta')}</button>
+    <button class="pulse-cta" style="margin-top:10px;margin-bottom:30px;padding:20px;border-radius:24px;font-size:15px;letter-spacing:.25em;box-shadow:0 12px 40px rgba(19,236,200,.25)" onclick="openTestimony()">${T('shareCta')}</button>
   </main>` + navBar('pulse');
 }
 function pulseAct(id){
