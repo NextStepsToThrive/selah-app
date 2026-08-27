@@ -359,6 +359,10 @@ if(!S.lang) S.lang='en';
 if(!S.user.divinePronoun) S.user.divinePronoun='none';
 if(!Array.isArray(S.user.divineNames) || !S.user.divineNames.length) S.user.divineNames = [S.user.divineName || 'The Divine'];
 if(!Array.isArray(S.user.divinePronouns) || !S.user.divinePronouns.length) S.user.divinePronouns = [S.user.divinePronoun || 'none'];
+if(Array.isArray(S.user.gifts) && S.user.gifts.includes('Bibliomancy')){
+  S.user.gifts = S.user.gifts.filter(g=>g!=='Bibliomancy');
+  if(!S.user.gifts.includes('Claircognizance')) S.user.gifts.push('Claircognizance');
+}
 save();
 
 /* ---------- lens translation maps ---------- */
@@ -493,15 +497,14 @@ const CLAIRS = [
   {k:'Clairsentience', icon:'touch_app'},{k:'Clairempathy', icon:'favorite'},
   {k:'Claircognizance', icon:'lightbulb'},{k:'Clairgustance', icon:'restaurant'},
   {k:'Clairsalience', icon:'air'},{k:'Clairtangency', icon:'pan_tool'},
-  {k:'Déjà Vu', icon:'history'},{k:'Déjà Rêvé', icon:'bedtime'},
-  {k:'Bibliomancy', icon:'auto_stories'}
+  {k:'Déjà Vu', icon:'history'},{k:'Déjà Rêvé', icon:'bedtime'}
 ];
 const CLAIR_INFO = {
   'Clairvoyance':{desc:'Seeing images, visions, or inner pictures that carry meaning.', syn:'clear seeing, visions, the seer gift, second sight'},
   'Clairaudience':{desc:'Hearing words, names, or sounds inwardly, beyond the ears.', syn:'clear hearing, the still small voice, inner hearing'},
   'Clairsentience':{desc:'A physical or gut feeling that carries information.', syn:'clear feeling, discernment, gut knowing'},
   'Clairempathy':{desc:'Feeling other people\'s emotions as if they were your own.', syn:'empath sense, burden bearing, emotional attunement'},
-  'Claircognizance':{desc:'Simply knowing something, without knowing how you know.', syn:'clear knowing, word of knowledge, direct knowing'},
+  'Claircognizance':{desc:'Simply knowing something, without knowing how you know — including being led straight to the passage a moment needed.', syn:'clear knowing, word of knowledge, direct knowing, bibliomancy / libromancy (opening a sacred book to the right page)'},
   'Clairgustance':{desc:'Tasting something that has no physical source.', syn:'clear tasting'},
   'Clairsalience':{desc:'Smelling a scent with no physical source, like perfume or smoke.', syn:'clear smelling, clairalience'},
   'Clairtangency':{desc:'Picking up impressions through touch, from objects or places.', syn:'clear touching, psychometry'},
@@ -1446,7 +1449,7 @@ function wireJournal(){
 const RITUAL_PATHS = [
   {k:'Prayer', icon:'volunteer_activism', sub:'Communion with the Divine', cat:null},
   {k:'Meditation', icon:'self_improvement', sub:'Stillness and presence', cat:null},
-  {k:'Scripture Reading', icon:'menu_book', sub:'Sacred wisdom', cat:'scripture'},
+  {k:'Scripture Reading', icon:'menu_book', sub:'Read with intention, or open at random (bibliomancy)', cat:'scripture'},
   {k:'Fasting', icon:'timer', sub:'Sacrifice and focus', cat:'ritual'},
   {k:'Spiritual Bath', icon:'bathtub', sub:'Purify the vessel', cat:'ritual'},
   {k:'Sacred Consecration', icon:'local_fire_department', sub:'Divine separation', cat:'ritual'},
